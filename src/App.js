@@ -1,6 +1,11 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import logo from "./logo.svg";
+import "./App.css";
+
+function foo() {
+  const moo = 5;
+  return `this is my ${moo}`;
+}
 
 class App extends Component {
   render() {
