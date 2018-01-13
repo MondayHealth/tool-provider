@@ -1,0 +1,14 @@
+@import "~@blueprintjs/core/dist/variables.scss";
+
+.App
+{
+  header
+  {
+    nav
+    {
+      background-color: $dark-gray2;
+    }
+    display: flex;
+    justify-content: space-between;
+  }
+}
