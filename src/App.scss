@@ -1,14 +1,37 @@
 @import "~@blueprintjs/core/dist/variables.scss";
 
+html
+{
+  background-color: $pt-app-background-color;
+  color: $pt-text-color;
+}
+
+
 .App
 {
   header
   {
-    nav
+    padding: 5px;
+    background-color: $dark-gray2;
+    #app-name
     {
-      background-color: $dark-gray2;
+      color: $light-gray1;
+      padding: 0;
+      margin: 0;
+    }
+
+    #name-display
+    {
+      color: $gray1;
+      padding: 0;
+      margin: 2px 0 0;
     }
     display: flex;
     justify-content: space-between;
+  }
+
+  #content
+  {
+    display: flex;
   }
 }
