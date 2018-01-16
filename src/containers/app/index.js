@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Link, Route } from "react-router-dom";
 import "./App.css";
 
 const APP_NAME = "Provider";
@@ -27,7 +28,14 @@ class App extends Component {
           <h2 id="app-name">{APP_NAME}</h2>
           <h4 id="name-display">{this.state.name}</h4>
         </header>
-        <p className="App-intro">Hello, world.</p>
+        <aside>
+          <Link to="/">Home</Link>
+          <Link to="/about">About</Link>
+        </aside>
+        <main>
+          <Route exact path="/" component={Home} />
+          <Route exact path="/about" component={About} />
+        </main>
       </div>
     );
   }
