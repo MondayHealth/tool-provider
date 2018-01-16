@@ -1,10 +1,8 @@
+import React from "react";
 
-
-const Home = props => (
+export default () => (
   <div>
-    <h1>Home!</h1>
-    <p>Welcome to the Home Page.</p>
+    <h1>About Us</h1>
+    <p>Hello Medium!</p>
   </div>
-)
-
-export default connect(null, )
+);
