@@ -5,8 +5,7 @@ import { push } from "react-router-redux";
 
 const Home = props => (
   <div>
-    <h1>Home!</h1>
-    <p>Welcome to the Home Page.</p>
+    <p>This should list providers.</p>
   </div>
 );
 
