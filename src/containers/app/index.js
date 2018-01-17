@@ -3,33 +3,16 @@ import { Link, Route } from "react-router-dom";
 import "./App.css";
 import About from "../about";
 import Home from "../home";
-
-const APP_NAME = "Provider";
+import Header from "../header";
+import { connect } from "react-redux";
+import { hello } from "../../state/api/actions";
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { name: "", email: "" };
-  }
-
-  async componentDidMount() {
-    const res = await fetch("/api/1/hello");
-    const result = await res.json();
-
-    if (!result.success) {
-      console.error("Failed to hello!", result);
-    }
-
-    this.setState(result.result);
-  }
 
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <h2 id="app-name">{APP_NAME}</h2>
-          <h4 id="name-display">{this.state.name}</h4>
-        </header>
+        <Header />
         <aside>
           <Link to="/">Home</Link>
           <Link to="/about">About</Link>
