@@ -10,32 +10,63 @@ function requestError(request) {
   };
 }
 
-export const REQUEST_HELLO = "REQUEST_HELLO";
-function requestHello() {
-  return {
-    type: REQUEST_HELLO
-  };
-}
+export const REQUEST_HELLO = "tx:hello";
+export const RECEIVE_HELLO = "rx:hello";
+export const REQUEST_PROVIDER_RECORD_COUNT = "tx:providers/count";
+export const RECEIVE_PROVIDER_RECORD_COUNT = "rx:providers/count";
+export const REQUEST_PROVIDER_RECORD_LIST = "tx:providers/list";
+export const RECEIVE_PROVIDER_RECORD_LIST = "rx:providers/list";
 
-export const RECEIVE_HELLO = "RECEIVE_HELLO";
-function receiveHello(result) {
+function rxAction(endpoint, result) {
   return {
-    type: RECEIVE_HELLO,
+    type: "rx:" + endpoint,
     receivedAt: Date.now(),
-    user: result
+    result: result
   };
 }
 
-export function hello(dispatch) {
-  return function() {
-    dispatch(requestHello());
-
-    const REQ = "hello";
-
-    return fetch(apiURL(REQ))
-      .then(response => response.json(), error => console.error(REQ, error))
-      .then(json =>
-        dispatch(json.success ? receiveHello(json.result) : requestError(REQ))
-      );
+function txAction(endpoint) {
+  return {
+    type: "tx:" + endpoint
   };
 }
+
+function generate(endpoint) {
+  return function(dispatch) {
+    return function(args) {
+      dispatch(txAction(endpoint));
+
+      let sub = endpoint;
+
+      if (args) {
+        let keys = Object.getOwnPropertyNames(args);
+        let len = keys.length;
+        let params = [];
+        for (let i = 0; i < len; i++) {
+          params.push(keys[i] + "=" + args[keys[i]]);
+        }
+
+        sub += "?" + params.join("&");
+      }
+
+      return fetch(apiURL(sub))
+        .then(
+          response => response.json(),
+          error => console.error(endpoint, error)
+        )
+        .then(json =>
+          dispatch(
+            json.success
+              ? rxAction(endpoint, json.result)
+              : requestError(endpoint)
+          )
+        );
+    };
+  };
+}
+
+export const hello = generate("hello");
+
+export const providerCount = generate("providers/count");
+
+export const providerList = generate("providers/list");

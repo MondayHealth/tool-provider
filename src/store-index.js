@@ -8,7 +8,6 @@ export const history = createHistory();
 
 const initialState = {};
 const enhancers = [];
-const middleware = [thunk, routerMiddleware(history)];
 
 if (process.env.NODE_ENV === "development") {
   const devToolsExtension = window.devToolsExtension;
@@ -18,7 +17,8 @@ if (process.env.NODE_ENV === "development") {
   }
 }
 
-const composedEnhancers = compose(applyMiddleware(...middleware), ...enhancers);
+const middleware = applyMiddleware(thunk, routerMiddleware(history));
+const composedEnhancers = compose(middleware, ...enhancers);
 
 const store = createStore(rootReducer, initialState, composedEnhancers);
 
