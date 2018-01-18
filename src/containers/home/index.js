@@ -2,32 +2,51 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 
 import PropTypes from "prop-types";
+import { providerCount, providerList } from "../../state/api/actions";
+
+import ProviderResultList from "./provider-result-list";
+import PaginationEditor from "./pagination-editor";
 
 class Home extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      offset: 100,
-      limit: 1000
+    this.providerOffset = {
+      offset: 0,
+      count: 100
     };
-
     this.offsetChanged = this.offsetChanged.bind(this);
+    this.countChanged = this.countChanged.bind(this);
   }
 
-  offsetChanged(event) {
-    this.setState({ offset: event.target.value });
+  componentWillMount() {
+    this.props.loadProviderCount();
+    this.reloadProviderOffset();
+  }
+
+  reloadProviderOffset() {
+    this.props.loadProviderOffset(this.providerOffset);
+  }
+
+  offsetChanged(newVal) {
+    this.providerOffset.offset = newVal;
+    this.reloadProviderOffset();
+  }
+
+  countChanged(newVal) {
+    this.providerOffset.count = newVal;
+    this.reloadProviderOffset();
   }
 
   render() {
     return (
       <div>
-        <p>This should list providers.</p>
-        <p>{this.props.email}</p>
+        <PaginationEditor
+          total={this.props.provider.serverCount}
+          onOffsetChanged={this.offsetChanged}
+          onCountChanged={this.countChanged}
+        />
 
-        <label>
-          Offset
-          <input value={this.state.offset} onChange={this.offsetChanged} />
-        </label>
+        <ProviderResultList elements={this.props.provider.byID} />
       </div>
     );
   }
@@ -38,7 +57,17 @@ Home.propTypes = {
 };
 
 const mapStateToProps = state => {
-  return state.userState;
+  return {
+    user: state.userState,
+    provider: state.providers
+  };
 };
 
-export default connect(mapStateToProps)(Home);
+const mapDispatchToProps = dispatch => {
+  return {
+    loadProviderCount: providerCount(dispatch),
+    loadProviderOffset: providerList(dispatch)
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Home);
