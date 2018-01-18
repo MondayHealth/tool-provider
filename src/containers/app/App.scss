@@ -35,3 +35,18 @@ html
     display: flex;
   }
 }
+
+div.pagination-editor
+{
+  width: 100%;
+  label
+  {
+    padding: 5px;
+    display: inline-block;
+    input
+    {
+      max-width: 64px;
+      text-align: center;
+    }
+  }
+}

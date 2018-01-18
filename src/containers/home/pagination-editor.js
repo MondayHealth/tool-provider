@@ -5,19 +5,35 @@ class PaginationEditor extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      offset: props.offset || 0,
-      count: props.count || 100
+      count: props.count,
+      page: 0,
+      pages: Math.ceil(props.total / props.count)
     };
 
-    this.offsetChanged = this.offsetChanged.bind(this);
     this.countChanged = this.countChanged.bind(this);
+    this.pageChanged = this.pageChanged.bind(this);
+
+    this.options = [50, 100, 500].map(value => (
+      <option key={value} value={value}>
+        {value}
+      </option>
+    ));
   }
 
-  offsetChanged(event) {
+  recalculateOffset() {
+    const offset = this.state.count * this.state.page;
+    this.props.onOffsetChanged(offset);
+  }
+
+  pageChanged(event) {
     const newVal = parseInt(event.target.value, 10) || 0;
 
-    this.setState({ offset: newVal });
-    this.props.onOffsetChanged(newVal);
+    if (newVal < 0 || newVal > this.pages) {
+      return;
+    }
+
+    this.setState({ page: newVal });
+    this.recalculateOffset();
   }
 
   countChanged(event) {
@@ -27,22 +43,36 @@ class PaginationEditor extends Component {
       return;
     }
 
-    this.setState({ count: newVal });
+    const newPages = Math.ceil(this.props.total / newVal);
+    this.setState({ count: newVal, pages: newPages });
     this.props.onCountChanged(newVal);
+    this.recalculateOffset();
   }
 
   render() {
     return (
       <div className="pagination-editor">
-        <label>
-          Offset
-          <input value={this.state.offset} onChange={this.offsetChanged} />
+        <label className="pt-label" id="offset">
+          Page
+          <input
+            className="pt-input"
+            value={this.state.page}
+            onChange={this.pageChanged}
+          />
         </label>
-        <label>
-          Count
-          <input value={this.state.count} onChange={this.countChanged} />
+        <span>of {this.state.pages} pages</span>
+        <label className="pt-label">
+          Results Per Page
+          <div className="pt-select">
+            <select
+              defaultValue={this.props.count}
+              onChange={this.countChanged}
+            >
+              {this.options}
+            </select>
+          </div>
         </label>
-        <span>count: {this.props.total}</span>
+        <span>of {this.props.total} total.</span>
       </div>
     );
   }
@@ -50,7 +80,6 @@ class PaginationEditor extends Component {
 
 PaginationEditor.propTypes = {
   total: PropTypes.number.isRequired,
-  offset: PropTypes.number,
   count: PropTypes.number,
   onCountChanged: PropTypes.func.isRequired,
   onOffsetChanged: PropTypes.func.isRequired
