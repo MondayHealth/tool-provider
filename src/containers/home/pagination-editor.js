@@ -14,13 +14,19 @@ class PaginationEditor extends Component {
   }
 
   offsetChanged(event) {
-    const newVal = event.target.value;
+    const newVal = parseInt(event.target.value, 10) || 0;
+
     this.setState({ offset: newVal });
     this.props.onOffsetChanged(newVal);
   }
 
   countChanged(event) {
-    const newVal = event.target.value;
+    const newVal = parseInt(event.target.value, 10) || 0;
+
+    if (!newVal) {
+      return;
+    }
+
     this.setState({ count: newVal });
     this.props.onCountChanged(newVal);
   }

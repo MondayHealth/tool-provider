@@ -42,6 +42,8 @@ class Home extends Component {
       <div>
         <PaginationEditor
           total={this.props.provider.serverCount}
+          offset={this.providerOffset.offset}
+          count={this.providerOffset.count}
           onOffsetChanged={this.offsetChanged}
           onCountChanged={this.countChanged}
         />
