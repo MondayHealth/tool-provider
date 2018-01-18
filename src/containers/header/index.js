@@ -20,7 +20,6 @@ class Header extends Component {
 }
 
 const mapToProps = state => {
-  console.log("update", state);
   return state.userState;
 };
 
