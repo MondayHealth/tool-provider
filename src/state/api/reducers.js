@@ -6,11 +6,6 @@ const initialUserState = {
 };
 
 export function userState(state = initialUserState, action) {
-  if (!action) {
-    return state;
-  }
-
-  console.log("state", state, "action", action);
   switch (action.type) {
     case RECEIVE_HELLO:
       return action.user;
@@ -18,3 +13,4 @@ export function userState(state = initialUserState, action) {
       return state;
   }
 }
+

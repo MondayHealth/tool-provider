@@ -4,11 +4,8 @@ import "./App.css";
 import About from "../about";
 import Home from "../home";
 import Header from "../header";
-import { connect } from "react-redux";
-import { hello } from "../../state/api/actions";
 
 class App extends Component {
-
   render() {
     return (
       <div className="App">
