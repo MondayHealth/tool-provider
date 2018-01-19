@@ -13,6 +13,7 @@ class Home extends Component {
       offset: 0,
       count: 100
     };
+    this.initialCount = 50;
     this.offsetChanged = this.offsetChanged.bind(this);
   }
 
@@ -49,7 +50,7 @@ class Home extends Component {
           <div className="home-results-container">
             <PaginationEditor
               total={this.props.provider.serverCount}
-              initialCount={this.providerOffset.count}
+              initialCount={this.initialCount}
               onOffsetChanged={this.offsetChanged}
             />
             <ProviderResultList elements={this.props.provider.byID} />

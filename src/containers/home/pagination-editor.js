@@ -6,7 +6,7 @@ class PaginationEditor extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      count: props.initialCount || 100,
+      count: props.initialCount || 50,
       page: 1,
       pageCount: 1
     };
@@ -14,7 +14,7 @@ class PaginationEditor extends Component {
     this.countChanged = this.countChanged.bind(this);
     this.pageChanged = this.pageChanged.bind(this);
 
-    this.options = [50, 100, 500].map(value => (
+    this.options = [25, 50, 100].map(value => (
       <option key={value} value={value}>
         {value}
       </option>
