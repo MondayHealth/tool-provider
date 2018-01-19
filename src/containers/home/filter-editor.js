@@ -8,7 +8,11 @@ class FilterEditor extends Component {
   render() {
     return (
       <div className={"filter-editor"}>
-        <span>This is a filter result.</span>
+        <h3>Search Filters</h3>
+        <div className={"filter-element"}>This is a filter setting.</div>
+        <div className={"filter-element"}>This is a filter setting.</div>
+        <div className={"filter-element"}>This is a filter setting.</div>
+        <div className={"filter-element"}>This is a filter setting.</div>
       </div>
     );
   }
