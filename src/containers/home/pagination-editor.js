@@ -1,13 +1,14 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
+import { Classes, NumericInput } from "@blueprintjs/core";
 
 class PaginationEditor extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      count: props.count,
-      page: 0,
-      pages: Math.ceil(props.total / props.count)
+      count: props.initialCount || 100,
+      page: 1,
+      pageCount: 1
     };
 
     this.countChanged = this.countChanged.bind(this);
@@ -20,20 +21,26 @@ class PaginationEditor extends Component {
     ));
   }
 
-  recalculateOffset() {
-    const offset = this.state.count * this.state.page;
-    this.props.onOffsetChanged(offset);
+  componentWillReceiveProps(nextProps) {
+    if (this.props.total !== nextProps.total) {
+      let npc = Math.ceil(nextProps.total / this.state.count);
+      this.setState({ pageCount: npc });
+    }
   }
 
-  pageChanged(event) {
-    const newVal = parseInt(event.target.value, 10) || 0;
+  recalculateOffset(page, count) {
+    const offset = count * (page - 1);
 
-    if (newVal < 0 || newVal > this.pages) {
+    if (offset < 0 || offset > this.props.total) {
       return;
     }
 
+    this.props.onOffsetChanged(offset, count);
+  }
+
+  pageChanged(newVal) {
     this.setState({ page: newVal });
-    this.recalculateOffset();
+    this.recalculateOffset(newVal, this.state.count);
   }
 
   countChanged(event) {
@@ -44,35 +51,41 @@ class PaginationEditor extends Component {
     }
 
     const newPages = Math.ceil(this.props.total / newVal);
-    this.setState({ count: newVal, pages: newPages });
-    this.props.onCountChanged(newVal);
-    this.recalculateOffset();
+    this.setState({ count: newVal, pageCount: newPages });
+    this.recalculateOffset(this.state.page, newVal);
   }
 
   render() {
+    let paginator = null;
+
+    if (this.state.pageCount > 1) {
+      paginator = (
+        <NumericInput
+          className={Classes.FILL}
+          value={this.state.page}
+          min={1}
+          max={this.state.pageCount}
+          onValueChange={this.pageChanged}
+          placeholder="Page"
+        />
+      );
+    } else {
+      paginator = <NumericInput value={1} disabled={true} />;
+    }
+
     return (
       <div className="pagination-editor">
-        <label className="pt-label" id="offset">
-          Page
-          <input
-            className="pt-input"
-            value={this.state.page}
-            onChange={this.pageChanged}
-          />
-        </label>
-        <span>of {this.state.pages} pages</span>
-        <label className="pt-label">
-          Results Per Page
-          <div className="pt-select">
-            <select
-              defaultValue={this.props.count}
-              onChange={this.countChanged}
-            >
-              {this.options}
-            </select>
-          </div>
-        </label>
-        <span>of {this.props.total} total.</span>
+        <div className="pt-form-group pt-inline">
+          <label className="pt-label">Page</label>
+          {paginator}
+        </div>
+        <span>of {this.state.pageCount} pages.</span>
+        <div className="pt-select">
+          <select defaultValue={this.state.count} onChange={this.countChanged}>
+            {this.options}
+          </select>
+        </div>
+        <span>results per page. {this.props.total} total results.</span>
       </div>
     );
   }
@@ -81,7 +94,8 @@ class PaginationEditor extends Component {
 PaginationEditor.propTypes = {
   total: PropTypes.number.isRequired,
   count: PropTypes.number,
-  onCountChanged: PropTypes.func.isRequired,
+  page: PropTypes.number,
+  initialCount: PropTypes.number,
   onOffsetChanged: PropTypes.func.isRequired
 };
 

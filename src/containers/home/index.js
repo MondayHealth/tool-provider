@@ -1,7 +1,5 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-
-import PropTypes from "prop-types";
 import { providerCount, providerList } from "../../state/api/actions";
 
 import ProviderResultList from "./provider-result-list";
@@ -15,7 +13,6 @@ class Home extends Component {
       count: 100
     };
     this.offsetChanged = this.offsetChanged.bind(this);
-    this.countChanged = this.countChanged.bind(this);
   }
 
   componentWillMount() {
@@ -27,14 +24,20 @@ class Home extends Component {
     this.props.loadProviderOffset(this.providerOffset);
   }
 
-  offsetChanged(newVal) {
-    this.providerOffset.offset = newVal;
-    this.reloadProviderOffset();
-  }
+  offsetChanged(offset, count) {
+    let delta = false;
+    if (this.providerOffset.offset !== offset) {
+      this.providerOffset.offset = offset;
+      delta = true;
+    }
+    if (this.providerOffset.count !== count) {
+      this.providerOffset.count = count;
+      delta = true;
+    }
 
-  countChanged(newVal) {
-    this.providerOffset.count = newVal;
-    this.reloadProviderOffset();
+    if (delta) {
+      this.reloadProviderOffset();
+    }
   }
 
   render() {
@@ -42,10 +45,8 @@ class Home extends Component {
       <div>
         <PaginationEditor
           total={this.props.provider.serverCount}
-          offset={this.providerOffset.offset}
-          count={this.providerOffset.count}
+          initialCount={this.providerOffset.count}
           onOffsetChanged={this.offsetChanged}
-          onCountChanged={this.countChanged}
         />
 
         <ProviderResultList elements={this.props.provider.byID} />
@@ -53,10 +54,6 @@ class Home extends Component {
     );
   }
 }
-
-Home.propTypes = {
-  offset: PropTypes.number
-};
 
 const mapStateToProps = state => {
   return {
