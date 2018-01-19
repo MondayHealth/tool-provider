@@ -4,6 +4,7 @@ import { providerCount, providerList } from "../../state/api/actions";
 
 import ProviderResultList from "./provider-result-list";
 import PaginationEditor from "./pagination-editor";
+import FilterEditor from "./filter-editor";
 
 class Home extends Component {
   constructor(props) {
@@ -43,13 +44,17 @@ class Home extends Component {
   render() {
     return (
       <div>
-        <PaginationEditor
-          total={this.props.provider.serverCount}
-          initialCount={this.providerOffset.count}
-          onOffsetChanged={this.offsetChanged}
-        />
-
-        <ProviderResultList elements={this.props.provider.byID} />
+        <div className="home-content-container">
+          <FilterEditor />
+          <div className="home-results-container">
+            <PaginationEditor
+              total={this.props.provider.serverCount}
+              initialCount={this.providerOffset.count}
+              onOffsetChanged={this.offsetChanged}
+            />
+            <ProviderResultList elements={this.props.provider.byID} />
+          </div>
+        </div>
       </div>
     );
   }

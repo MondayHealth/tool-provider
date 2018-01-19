@@ -36,34 +36,61 @@ html
   }
 }
 
-div.pagination-editor
+
+div.home-content-container
 {
   display: flex;
 
-  background-color: $gray5;
-  padding: 5px;
-  color: $gray1;
-
-  span
+  .filter-editor
   {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-
-  }
-  .pt-form-group
-  {
-    margin: 0;
-    padding-right: 5px;
-  }
-  .pt-numeric-input
-  {
-    max-width: 88px;
-  }
-  .pt-select
-  {
-    padding-left: 5px;
-    padding-right: 5px;
+    padding: 20px;
+    width: 200px;
+    background-color: $dark-gray5;
+    color: $gray3;
   }
 
+  .home-results-container
+  {
+    width: 100%;
+
+    .pagination-editor
+    {
+      display: flex;
+      width: 100%;
+
+      background-color: $light-gray2;
+      padding: 10px;
+      color: $gray3;
+
+      span
+      {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+
+      }
+      .pt-form-group
+      {
+        margin: 0;
+        padding-right: 5px;
+      }
+      .pt-numeric-input
+      {
+        max-width: 88px;
+      }
+      .pt-select
+      {
+        padding-left: 5px;
+        padding-right: 5px;
+      }
+
+    }
+
+    .provider-result-list
+    {
+      width: 100%;
+      padding: 10px;
+    }
+  }
 }
+
