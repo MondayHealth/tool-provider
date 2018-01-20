@@ -1,7 +1,8 @@
 import {
   RECEIVE_HELLO,
+  RECEIVE_PAYORS_FIXTURE,
   RECEIVE_PROVIDER_RECORD_COUNT,
-  RECEIVE_PROVIDER_RECORD_LIST,
+  RECEIVE_PROVIDER_RECORD_LIST
 } from "./actions";
 
 const initialUserState = {
@@ -38,6 +39,27 @@ export function providers(state = initialProviderState, action) {
       return { ...state, serverCount: action.result };
     case RECEIVE_PROVIDER_RECORD_LIST:
       return { ...state, byID: generateProviderIDDictionary(action.result) };
+    default:
+      return state;
+  }
+}
+
+const initialFixturesState = {
+  payors: []
+};
+
+function generatePayorArray(data) {
+  const ret = [];
+  Object.entries(data).forEach(
+    ([key, value]) => (ret[parseInt(key, 10)] = value)
+  );
+  return ret;
+}
+
+export function fixtures(state = initialFixturesState, action) {
+  switch (action.type) {
+    case RECEIVE_PAYORS_FIXTURE:
+      return { ...state, payors: generatePayorArray(action.result) };
     default:
       return state;
   }

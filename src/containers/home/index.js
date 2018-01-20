@@ -13,8 +13,13 @@ class Home extends Component {
       offset: 0,
       count: 100
     };
+    this.filters = {
+      payor: 0
+    };
     this.initialCount = 50;
+
     this.offsetChanged = this.offsetChanged.bind(this);
+    this.filtersChanged = this.filtersChanged.bind(this);
   }
 
   componentWillMount() {
@@ -42,11 +47,15 @@ class Home extends Component {
     }
   }
 
+  filtersChanged(newFilters) {
+    console.log(newFilters);
+  }
+
   render() {
     return (
       <div>
         <div className="home-content-container">
-          <FilterEditor />
+          <FilterEditor onFiltersChanged={this.filtersChanged} />
           <div className="home-results-container">
             <PaginationEditor
               total={this.props.provider.serverCount}
@@ -63,7 +72,6 @@ class Home extends Component {
 
 const mapStateToProps = state => {
   return {
-    user: state.userState,
     provider: state.providers
   };
 };
