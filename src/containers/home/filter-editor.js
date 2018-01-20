@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 
-const I_CLASSES = "pt-input pt-fill";
+const INPUT_CLASSES = "pt-input pt-fill";
 
 class FilterEditor extends Component {
   constructor(props) {
@@ -53,7 +53,7 @@ class FilterEditor extends Component {
         <h3>Search Filters</h3>
         <label className={"pt-label"}>
           Address
-          <input className={I_CLASSES} type="text" />
+          <input className={INPUT_CLASSES} type="text" />
         </label>
 
         <label className="pt-label">
@@ -70,7 +70,7 @@ class FilterEditor extends Component {
 
         <label className={"pt-label"}>
           Specialty
-          <input className={I_CLASSES} type="text" />
+          <input className={INPUT_CLASSES} type="text" />
         </label>
 
         <label className="pt-control pt-checkbox pt-large">

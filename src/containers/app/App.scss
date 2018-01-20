@@ -106,3 +106,25 @@ div.home-content-container
   }
 }
 
+span.no-website
+{
+  color: $gray5;
+}
+
+tbody.results-list
+{
+  td.first-name
+  {
+    max-width: 192px;
+  }
+  td.credentials
+  {
+    span
+    {
+      font-size: 12px;
+      color: $gray1;
+      background-color: $light-gray2;
+      margin-right: 5px;
+    }
+  }
+}

@@ -1,4 +1,5 @@
 import {
+  RECEIVE_CREDENTIALS_FIXTURE,
   RECEIVE_HELLO,
   RECEIVE_PAYORS_FIXTURE,
   RECEIVE_PROVIDER_RECORD_COUNT,
@@ -45,7 +46,8 @@ export function providers(state = initialProviderState, action) {
 }
 
 const initialFixturesState = {
-  payors: []
+  payors: [],
+  credentials: {}
 };
 
 function generatePayorArray(data) {
@@ -56,10 +58,21 @@ function generatePayorArray(data) {
   return ret;
 }
 
+function generateCredentialsDictionary(data) {
+  const ret = {};
+  Object.entries(data).forEach(([key, value]) => (ret[key] = value));
+  return ret;
+}
+
 export function fixtures(state = initialFixturesState, action) {
   switch (action.type) {
     case RECEIVE_PAYORS_FIXTURE:
       return { ...state, payors: generatePayorArray(action.result) };
+    case RECEIVE_CREDENTIALS_FIXTURE:
+      return {
+        ...state,
+        credentials: generateCredentialsDictionary(action.result)
+      };
     default:
       return state;
   }

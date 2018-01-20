@@ -79,13 +79,12 @@ class PaginationEditor extends Component {
           <label className="pt-label">Page</label>
           {paginator}
         </div>
-        <span>of {this.state.pageCount} pages.</span>
         <div className="pt-select">
           <select defaultValue={this.state.count} onChange={this.countChanged}>
             {this.options}
           </select>
         </div>
-        <span>results per page. {this.props.total} total results.</span>
+        <span>results per page. ({this.props.total} total records.)</span>
       </div>
     );
   }

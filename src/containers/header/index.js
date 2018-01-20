@@ -1,6 +1,9 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { hello, payorsFixture } from "../../state/api/actions";
+import {
+  credentialsFixture, hello,
+  payorsFixture
+} from "../../state/api/actions";
 
 const APP_NAME = "Provider";
 
@@ -8,6 +11,7 @@ class Header extends Component {
   componentWillMount() {
     this.props.loadUserState();
     this.props.loadPayorsFixture();
+    this.props.loadCredentialsFixture();
   }
 
   render() {
@@ -27,7 +31,8 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     loadUserState: hello(dispatch),
-    loadPayorsFixture: payorsFixture(dispatch)
+    loadPayorsFixture: payorsFixture(dispatch),
+    loadCredentialsFixture: credentialsFixture(dispatch)
   };
 };
 

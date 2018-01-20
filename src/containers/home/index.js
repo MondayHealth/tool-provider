@@ -6,49 +6,76 @@ import ProviderResultList from "./provider-result-list";
 import PaginationEditor from "./pagination-editor";
 import FilterEditor from "./filter-editor";
 
+function shallowEquals(a, b) {
+  let keys = Object.keys(a);
+  for (let key in keys) {
+    if (!(key in b) || a[key] !== b[key]) {
+      return false;
+    }
+  }
+
+  keys = Object.keys(b);
+  for (let key in keys) {
+    if (!(key in a) || a[key] !== b[key]) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
 class Home extends Component {
   constructor(props) {
     super(props);
+
     this.providerOffset = {
       offset: 0,
       count: 100
     };
+
     this.filters = {
       payor: 0
     };
+
     this.initialCount = 50;
 
     this.offsetChanged = this.offsetChanged.bind(this);
     this.filtersChanged = this.filtersChanged.bind(this);
+
+    this.currentParams = {};
   }
 
   componentWillMount() {
     this.props.loadProviderCount();
-    this.reloadProviderOffset();
+    this.reload();
   }
 
-  reloadProviderOffset() {
-    this.props.loadProviderOffset(this.providerOffset);
+  reload() {
+    const params = Object.assign({}, this.providerOffset, this.filters);
+
+    // This is how we indicate that we don't wanna filter by payor
+    if (params.payor < 1) {
+      delete params.payor;
+    }
+
+    // Don't do anything if the params haven't changed
+    if (shallowEquals(params, this.currentParams)) {
+      return;
+    }
+
+    this.currentParams = params;
+    this.props.loadProviderOffset(this.currentParams);
   }
 
   offsetChanged(offset, count) {
-    let delta = false;
-    if (this.providerOffset.offset !== offset) {
-      this.providerOffset.offset = offset;
-      delta = true;
-    }
-    if (this.providerOffset.count !== count) {
-      this.providerOffset.count = count;
-      delta = true;
-    }
-
-    if (delta) {
-      this.reloadProviderOffset();
-    }
+    this.providerOffset.offset = offset;
+    this.providerOffset.count = count;
+    this.reload();
   }
 
   filtersChanged(newFilters) {
-    console.log(newFilters);
+    this.filters = newFilters;
+    this.reload();
   }
 
   render() {
