@@ -12,6 +12,7 @@ class FilterEditor extends Component {
     };
 
     this.payorOptions = null;
+    this.specialtyOptions = null;
 
     this.insuranceSelectChanged = this.insuranceSelectChanged.bind(this);
   }
@@ -30,6 +31,14 @@ class FilterEditor extends Component {
       <option key={"0"} value="0">
         None
       </option>
+    );
+
+    this.specialtyOptions = Object.entries(nextProps.fixtures.specialties).map(
+      ([index, value]) => (
+        <option key={index} value={index}>
+          {value}
+        </option>
+      )
     );
   }
 
@@ -68,9 +77,13 @@ class FilterEditor extends Component {
           </div>
         </label>
 
-        <label className={"pt-label"}>
+        <label className="pt-label">
           Specialty
-          <input className={INPUT_CLASSES} type="text" />
+          <div className="pt-select">
+            <select defaultValue={0} onChange={this.insuranceSelectChanged}>
+              {this.specialtyOptions}
+            </select>
+          </div>
         </label>
 
         <label className="pt-control pt-checkbox pt-large">

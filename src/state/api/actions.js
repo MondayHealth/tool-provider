@@ -12,6 +12,8 @@ function requestError(request) {
 
 export const REQUEST_HELLO = "tx:hello";
 export const RECEIVE_HELLO = "rx:hello";
+export const REQUEST_SPECIALTIES_FIXTURE = "tx:fixtures/specialties";
+export const RECEIVE_SPECIALTIES_FIXTURE = "rx:fixtures/specialties";
 export const REQUEST_CREDENTIALS_FIXTURE = "tx:fixtures/credentials";
 export const RECEIVE_CREDENTIALS_FIXTURE = "rx:fixtures/credentials";
 export const REQUEST_PAYORS_FIXTURE = "tx:fixtures/payors";
@@ -72,6 +74,8 @@ function generate(endpoint) {
 export const payorsFixture = generate("fixtures/payors");
 
 export const credentialsFixture = generate("fixtures/credentials");
+
+export const specialtiesFixture = generate("fixtures/specialties");
 
 export const hello = generate("hello");
 
