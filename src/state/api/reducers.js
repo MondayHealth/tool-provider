@@ -12,6 +12,7 @@ const initialUserState = {
   email: ""
 };
 
+// noinspection JSUnusedGlobalSymbols
 export function userState(state = initialUserState, action) {
   switch (action.type) {
     case RECEIVE_HELLO:
@@ -39,6 +40,7 @@ function generateProviderIDDictionary(data) {
   return ret;
 }
 
+// noinspection JSUnusedGlobalSymbols
 export function providers(state = initialProviderState, action) {
   switch (action.type) {
     case RECEIVE_PROVIDER_RECORD_COUNT:
@@ -72,6 +74,7 @@ function generateIntKeyDictionary(data) {
   return ret;
 }
 
+// noinspection JSUnusedGlobalSymbols
 export function fixtures(state = initialFixturesState, action) {
   switch (action.type) {
     case RECEIVE_PAYORS_FIXTURE:
