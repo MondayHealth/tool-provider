@@ -28,8 +28,12 @@ const initialProviderState = {
 function generateProviderIDDictionary(data) {
   const ret = {};
   const count = data.length;
+
   for (let i = 0; i < count; i++) {
-    ret[data[i].id] = data[i];
+    let current = data[i];
+    if (current) {
+      ret[current.id] = current;
+    }
   }
   return ret;
 }

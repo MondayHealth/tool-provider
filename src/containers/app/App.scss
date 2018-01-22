@@ -115,7 +115,12 @@ tbody.results-list
 {
   td.first-name
   {
-    max-width: 192px;
+    max-width: 128px;
+  }
+
+  td.last-name
+  {
+    max-width: 128px;
   }
   td.credentials
   {
