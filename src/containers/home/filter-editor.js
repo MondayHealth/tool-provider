@@ -8,20 +8,21 @@ class FilterEditor extends Component {
     super(props);
 
     this.state = {
-      payor: "0"
+      payor: "0",
+      specialty: "0"
     };
 
-    this.payorOptions = null;
-    this.specialtyOptions = null;
+    this.payorOptions = [];
+    this.specialtyOptions = [];
+    this.regeneratePayorOptions(this.props);
+    this.regenerateSpecialtyOptions(this.props);
 
     this.insuranceSelectChanged = this.insuranceSelectChanged.bind(this);
+    this.specialtySelectChanged = this.specialtySelectChanged.bind(this);
   }
 
-  componentWillReceiveProps(nextProps) {
-    if (this.props.fixtures.payors === nextProps.fixtures.payors) {
-      return;
-    }
-    this.payorOptions = nextProps.fixtures.payors.map((value, index) => (
+  regeneratePayorOptions(props) {
+    this.payorOptions = props.fixtures.payors.map((value, index) => (
       <option key={index} value={index}>
         {value}
       </option>
@@ -32,14 +33,30 @@ class FilterEditor extends Component {
         None
       </option>
     );
+  }
 
-    this.specialtyOptions = Object.entries(nextProps.fixtures.specialties).map(
+  regenerateSpecialtyOptions(props) {
+    this.specialtyOptions = Object.entries(props.fixtures.specialties).map(
       ([index, value]) => (
         <option key={index} value={index}>
           {value}
         </option>
       )
     );
+    this.specialtyOptions.unshift(
+      <option key={"0"} value="0">
+        None
+      </option>
+    );
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.fixtures.payors !== nextProps.fixtures.payors) {
+      this.regeneratePayorOptions(nextProps);
+    }
+    if (this.props.fixtures.specialties !== nextProps.fixtures.specialties) {
+      this.regenerateSpecialtyOptions(nextProps);
+    }
   }
 
   filterStateHasChanged() {
@@ -52,6 +69,12 @@ class FilterEditor extends Component {
 
   insuranceSelectChanged(elt) {
     this.setState({ payor: elt.target.value }, () =>
+      this.filterStateHasChanged()
+    );
+  }
+
+  specialtySelectChanged(elt) {
+    this.setState({ specialty: elt.target.value }, () =>
       this.filterStateHasChanged()
     );
   }
@@ -80,7 +103,7 @@ class FilterEditor extends Component {
         <label className="pt-label">
           Specialty
           <div className="pt-select">
-            <select defaultValue={0} onChange={this.insuranceSelectChanged}>
+            <select defaultValue={0} onChange={this.specialtySelectChanged}>
               {this.specialtyOptions}
             </select>
           </div>
