@@ -61,7 +61,8 @@ class FilterEditor extends Component {
 
   filterStateHasChanged() {
     const newFilterState = {
-      payor: this.state.payor
+      payor: this.state.payor,
+      specialty: this.state.specialty
     };
 
     this.props.onFiltersChanged(newFilterState);
@@ -103,7 +104,10 @@ class FilterEditor extends Component {
         <label className="pt-label">
           Specialty
           <div className="pt-select">
-            <select defaultValue={0} onChange={this.specialtySelectChanged}>
+            <select
+              defaultValue={this.state.specialty}
+              onChange={this.specialtySelectChanged}
+            >
               {this.specialtyOptions}
             </select>
           </div>

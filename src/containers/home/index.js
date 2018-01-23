@@ -34,7 +34,8 @@ class Home extends Component {
     };
 
     this.filters = {
-      payor: 0
+      payor: 0,
+      specialty: 0
     };
 
     this.initialCount = 50;
@@ -56,6 +57,10 @@ class Home extends Component {
     // This is how we indicate that we don't wanna filter by payor
     if (params.payor < 1) {
       delete params.payor;
+    }
+
+    if (params.specialty < 1) {
+      delete params.specialty;
     }
 
     // Don't do anything if the params haven't changed
