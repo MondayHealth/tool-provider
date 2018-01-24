@@ -20,5 +20,6 @@
     <orderEntry type="library" name="@types/react-router-dom" level="application" />
     <orderEntry type="library" name="@types/react-router-redux" level="application" />
     <orderEntry type="library" name="@types/react-dom" level="application" />
+    <orderEntry type="library" name="@types/google-maps" level="application" />
   </component>
 </module>

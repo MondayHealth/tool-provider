@@ -1,11 +1,22 @@
 import {
+  GOOGLE_MAPS_LOADED,
   RECEIVE_CREDENTIALS_FIXTURE,
   RECEIVE_HELLO,
   RECEIVE_PAYORS_FIXTURE,
   RECEIVE_PROVIDER_RECORD_COUNT,
   RECEIVE_PROVIDER_RECORD_LIST,
-  RECEIVE_SPECIALTIES_FIXTURE
+  RECEIVE_SPECIALTIES_FIXTURE, REQUEST_GEOCODE
 } from "./actions";
+
+// noinspection JSUnusedGlobalSymbols
+export function maps(state = null, action) {
+  switch (action.type) {
+    case GOOGLE_MAPS_LOADED:
+      return window["google"]["maps"];
+    default:
+      return state;
+  }
+}
 
 const initialUserState = {
   name: "",
@@ -91,5 +102,26 @@ export function fixtures(state = initialFixturesState, action) {
       };
     default:
       return state;
+  }
+}
+
+const PENDING = Symbol("Geocode Pending Request");
+
+const initialGeocodeState = {
+  requests: {},
+  responses: {}
+};
+
+function updateRequests(oldDictionary, request, result)
+
+export function geocode(state = initialGeocodeState, action) {
+  switch (action.type)
+  {
+    case REQUEST_GEOCODE:
+      return {
+        ...state,
+        requests:
+      }
+
   }
 }

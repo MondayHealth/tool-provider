@@ -59,6 +59,23 @@ div.home-content-container
       background-color: $dark-gray4;
       margin-bottom: 5px;
     }
+
+    .address-search
+    {
+      margin-bottom: 15px;
+      .pt-spinner
+      {
+        position: absolute;
+        right: 3px;
+        top: 3px;
+      }
+    }
+
+    textarea
+    {
+      width: 100%;
+      min-height: 92px;
+    }
   }
 
   .home-results-container
@@ -124,6 +141,21 @@ tbody.results-list
   }
   td.credentials
   {
+    span
+    {
+      font-size: 12px;
+      color: $gray1;
+      background-color: $light-gray2;
+      margin-right: 5px;
+    }
+  }
+  td.specialties
+  {
+    max-width: 256px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
     span
     {
       font-size: 12px;

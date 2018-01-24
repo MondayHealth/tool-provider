@@ -1,3 +1,5 @@
+/* global google */
+
 function apiURL(subLocation) {
   return `/api/1/${subLocation}`;
 }
@@ -7,6 +9,44 @@ function requestError(request) {
   return {
     type: REQUEST_ERROR,
     error: [request]
+  };
+}
+
+export const GOOGLE_MAPS_LOADED = "GOOGLE_MAPS_LOADED";
+function googleMapsLoadedAction() {
+  return { type: GOOGLE_MAPS_LOADED };
+}
+
+export const REQUEST_GEOCODE = "tx:GEOCODE_ADDRESS_REQUEST";
+function requestGeocodeAction(address) {
+  return {
+    type: REQUEST_GEOCODE,
+    payload: {
+      address: address
+    }
+  };
+}
+
+export const RECEIVE_GEOCODE = "rx:GEOCODE_ADDRESS_RESPONSE";
+function receiveGeocodeAction(address, result) {
+  return {
+    type: RECEIVE_GEOCODE,
+    receivedAt: Date.now(),
+    payload: {
+      address,
+      result
+    }
+  };
+}
+
+export const RECEIVE_GEOCODE_ERROR = "rx:GEOCODE_ADDRESS_ERROR";
+function receiveGeocodeErrorAction(address, status) {
+  return {
+    type: RECEIVE_GEOCODE_ERROR,
+    payload: {
+      address,
+      status
+    }
   };
 }
 
@@ -82,3 +122,27 @@ export const hello = generate("hello");
 export const providerCount = generate("providers/count");
 
 export const providerList = generate("providers/list");
+
+export function googleMapsLoaded(dispatch) {
+  return function() {
+    dispatch(googleMapsLoadedAction());
+  };
+}
+
+export function geocodeAddress(dispatch) {
+  return function(address) {
+    dispatch(requestGeocodeAction(address));
+
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ address }, function ggrh(results, status) {
+      switch (status) {
+        case "OK":
+          dispatch(receiveGeocodeAction(address, results));
+          break;
+        default:
+          dispatch(receiveGeocodeErrorAction(address, status));
+          break;
+      }
+    });
+  };
+}
