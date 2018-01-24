@@ -35,7 +35,8 @@ class Home extends Component {
 
     this.filters = {
       payor: 0,
-      specialty: 0
+      specialty: 0,
+      coordinates: null
     };
 
     this.initialCount = 50;

@@ -5,7 +5,7 @@ import {
   RECEIVE_PAYORS_FIXTURE,
   RECEIVE_PROVIDER_RECORD_COUNT,
   RECEIVE_PROVIDER_RECORD_LIST,
-  RECEIVE_SPECIALTIES_FIXTURE, REQUEST_GEOCODE
+  RECEIVE_SPECIALTIES_FIXTURE
 } from "./actions";
 
 // noinspection JSUnusedGlobalSymbols
@@ -102,26 +102,5 @@ export function fixtures(state = initialFixturesState, action) {
       };
     default:
       return state;
-  }
-}
-
-const PENDING = Symbol("Geocode Pending Request");
-
-const initialGeocodeState = {
-  requests: {},
-  responses: {}
-};
-
-function updateRequests(oldDictionary, request, result)
-
-export function geocode(state = initialGeocodeState, action) {
-  switch (action.type)
-  {
-    case REQUEST_GEOCODE:
-      return {
-        ...state,
-        requests:
-      }
-
   }
 }

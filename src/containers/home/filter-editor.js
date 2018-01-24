@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { TopToaster } from "../../toaster";
 import { Intent, Spinner } from "@blueprintjs/core";
+import { geocode } from "../../util/gmaps";
 
 class FilterEditor extends Component {
   constructor(props) {
@@ -11,7 +12,9 @@ class FilterEditor extends Component {
       payor: "0",
       specialty: "0",
       processingAddress: false,
-      addressInputValue: ""
+      addressInputValue: "",
+      coordinate: null,
+      addressInputValidity: null
     };
 
     this.lastAddressSearched = "";
@@ -24,8 +27,9 @@ class FilterEditor extends Component {
     this.insuranceSelectChanged = this.insuranceSelectChanged.bind(this);
     this.specialtySelectChanged = this.specialtySelectChanged.bind(this);
     this.addressChanged = this.addressChanged.bind(this);
-    this.addressInputKeyup = this.addressInputKeyup.bind(this);
+    this.addressInputKeyUp = this.addressInputKeyUp.bind(this);
     this.addressInputChanged = this.addressInputChanged.bind(this);
+    this.geocodeResponse = this.geocodeResponse.bind(this);
   }
 
   regeneratePayorOptions(props) {
@@ -72,6 +76,11 @@ class FilterEditor extends Component {
       specialty: this.state.specialty
     };
 
+    if (this.state.coordinates) {
+      newFilterState.lat = this.state.coordinates.lat;
+      newFilterState.lng = this.state.coordinates.lng;
+    }
+
     this.props.onFiltersChanged(newFilterState);
   }
 
@@ -87,7 +96,7 @@ class FilterEditor extends Component {
     );
   }
 
-  addressChanged(elt) {
+  addressChanged(newVal) {
     if (!this.props.maps) {
       TopToaster.show({
         message: "Google Maps API not loaded.",
@@ -97,8 +106,6 @@ class FilterEditor extends Component {
       });
       return;
     }
-
-    const newVal = elt.target.value.trim();
 
     if (newVal === this.lastAddressSearched) {
       return;
@@ -110,49 +117,42 @@ class FilterEditor extends Component {
       return;
     }
 
-    console.log("New address:", newVal);
-
     this.setState({ processingAddress: true });
     this.lastAddressSearched = newVal;
-    // @TODO: REQUEST
+    geocode(newVal)
+      .then(this.geocodeResponse)
+      .catch(() => {
+        this.setState(
+          { coordinates: null, addressInputValidity: "danger" },
+          () => this.filterStateHasChanged()
+        );
+      })
+      .finally(() => {
+        this.setState({ processingAddress: false });
+      });
   }
 
-  geocodeResponse(results, status) {
-    this.setState({ processingAddress: false });
-    console.log(status);
-    console.log(results);
-
-    if (results.length < 1) {
-      TopToaster.show({
-        message: "No address for search " + this.state.addressInputValue,
-        intent: Intent.WARNING,
-        iconName: "error",
-        timeout: 3500
-      });
-      return;
-    }
-
-    if (results.length > 1) {
-      TopToaster.show({
-        message: "Multiple addresses for " + this.state.addressInputValue,
-        intent: Intent.WARNING,
-        iconName: "error",
-        timeout: 3500
-      });
-    }
-
-    const result = results[0];
-
-    this.setState({ addressInputValue: result.formatted_address });
+  geocodeResponse(result) {
+    this.setState(
+      {
+        addressInputValue: result.formatted_address,
+        addressInputValidity: "success",
+        coordinates: {
+          lat: result.geometry.location.lat(),
+          lng: result.geometry.location.lng()
+        }
+      },
+      () => this.filterStateHasChanged()
+    );
   }
 
   addressInputChanged(evt) {
     this.setState({ addressInputValue: evt.target.value });
   }
 
-  addressInputKeyup(evt) {
+  addressInputKeyUp(evt) {
     if (evt.keyCode === 13) {
-      this.addressChanged({ target: evt.target });
+      this.addressChanged(evt.target.value.trim());
     }
   }
 
@@ -173,14 +173,21 @@ class FilterEditor extends Component {
     return (
       <div className={"filter-editor"}>
         <h3>Search Filters</h3>
-        <div className="pt-input-group address-search">
+        <div
+          className={
+            "pt-input-group address-search " +
+            (this.state.addressInputValidity
+              ? "pt-intent-" + this.state.addressInputValidity
+              : "")
+          }
+        >
           <span className="pt-icon pt-icon-search" />
           <input
             type="text"
             disabled={this.state.processingAddress}
             className="pt-input"
             placeholder="Address"
-            onKeyUp={this.addressInputKeyup}
+            onKeyUp={this.addressInputKeyUp}
             onChange={this.addressInputChanged}
             value={this.state.addressInputValue}
           />
