@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { TopToaster } from "../../toaster";
-import { Intent, Spinner } from "@blueprintjs/core";
+import { Intent, Slider, Spinner } from "@blueprintjs/core";
 import { geocode } from "../../util/gmaps";
 
 class FilterEditor extends Component {
@@ -14,7 +14,8 @@ class FilterEditor extends Component {
       processingAddress: false,
       addressInputValue: "",
       coordinate: null,
-      addressInputValidity: null
+      addressInputValidity: null,
+      radius: 0.5
     };
 
     this.lastAddressSearched = "";
@@ -30,6 +31,8 @@ class FilterEditor extends Component {
     this.addressInputKeyUp = this.addressInputKeyUp.bind(this);
     this.addressInputChanged = this.addressInputChanged.bind(this);
     this.geocodeResponse = this.geocodeResponse.bind(this);
+    this.radiusSliderChange = this.radiusSliderChange.bind(this);
+    this.radiusSliderReleased = this.radiusSliderReleased.bind(this);
   }
 
   regeneratePayorOptions(props) {
@@ -73,7 +76,8 @@ class FilterEditor extends Component {
   filterStateHasChanged() {
     const newFilterState = {
       payor: this.state.payor,
-      specialty: this.state.specialty
+      specialty: this.state.specialty,
+      radius: this.state.radius * 1609.34
     };
 
     if (this.state.coordinates) {
@@ -94,6 +98,14 @@ class FilterEditor extends Component {
     this.setState({ specialty: elt.target.value }, () =>
       this.filterStateHasChanged()
     );
+  }
+
+  radiusSliderChange(value) {
+    this.setState({ radius: value });
+  }
+
+  radiusSliderReleased(value) {
+    this.setState({ radius: value }, () => this.filterStateHasChanged());
   }
 
   addressChanged(newVal) {
@@ -194,6 +206,22 @@ class FilterEditor extends Component {
           />
           {addressButton}
         </div>
+
+        <label className={"pt-label"}>
+          Radius (Miles)
+          <div className={"slider-container"}>
+            <Slider
+              min={0.25}
+              max={10}
+              stepSize={0.25}
+              labelStepSize={3}
+              value={this.state.radius}
+              onChange={this.radiusSliderChange}
+              onRelease={this.radiusSliderReleased}
+              disabled={this.state.addressInputValidity !== "success"}
+            />
+          </div>
+        </label>
 
         <label className="pt-label">
           Payor
