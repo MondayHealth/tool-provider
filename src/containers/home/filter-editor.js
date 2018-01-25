@@ -213,7 +213,7 @@ class FilterEditor extends Component {
           Radius (Miles)
           <div className={"slider-container"}>
             <Slider
-              min={500 / METERS_PER_MILE}
+              min={505 / METERS_PER_MILE}
               max={25}
               stepSize={0.5}
               labelStepSize={8}
