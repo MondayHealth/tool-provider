@@ -4,6 +4,8 @@ import { TopToaster } from "../../toaster";
 import { Intent, Slider, Spinner } from "@blueprintjs/core";
 import { geocode } from "../../util/gmaps";
 
+const METERS_PER_MILE = 1609.34;
+
 class FilterEditor extends Component {
   constructor(props) {
     super(props);
@@ -15,7 +17,7 @@ class FilterEditor extends Component {
       addressInputValue: "",
       coordinate: null,
       addressInputValidity: null,
-      radius: 0.5
+      radius: 1
     };
 
     this.lastAddressSearched = "";
@@ -77,7 +79,7 @@ class FilterEditor extends Component {
     const newFilterState = {
       payor: this.state.payor,
       specialty: this.state.specialty,
-      radius: this.state.radius * 1609.34
+      radius: this.state.radius * METERS_PER_MILE
     };
 
     if (this.state.coordinates) {
@@ -211,10 +213,10 @@ class FilterEditor extends Component {
           Radius (Miles)
           <div className={"slider-container"}>
             <Slider
-              min={0.25}
-              max={10}
-              stepSize={0.25}
-              labelStepSize={3}
+              min={500 / METERS_PER_MILE}
+              max={25}
+              stepSize={0.5}
+              labelStepSize={8}
               value={this.state.radius}
               onChange={this.radiusSliderChange}
               onRelease={this.radiusSliderReleased}
