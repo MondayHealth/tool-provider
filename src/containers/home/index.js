@@ -70,7 +70,7 @@ class Home extends Component {
     }
 
     this.currentParams = params;
-    this.props.loadProviderOffset(this.currentParams);
+    this.props.requery(this.currentParams);
   }
 
   offsetChanged(offset, count) {
@@ -112,7 +112,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     loadProviderCount: providerCount(dispatch),
-    loadProviderOffset: providerList(dispatch)
+    requery: providerList(dispatch)
   };
 };
 

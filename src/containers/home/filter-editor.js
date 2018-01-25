@@ -112,8 +112,9 @@ class FilterEditor extends Component {
     }
 
     if (!newVal) {
-      // @TODO: Clear the address search state
-      console.log("Address cleared.");
+      this.setState({ coordinates: null, addressInputValidity: null }, () =>
+        this.filterStateHasChanged()
+      );
       return;
     }
 
