@@ -5,6 +5,7 @@ import { providerCount, providerList } from "../../state/api/actions";
 import ProviderResultList from "./provider-result-list";
 import PaginationEditor from "./pagination-editor";
 import FilterEditor from "./filter-editor";
+import MapResults from "./map-results";
 
 function shallowEquals(a, b) {
   let keys = Object.keys(a);
@@ -97,6 +98,7 @@ class Home extends Component {
             />
             <ProviderResultList elements={this.props.provider.byID} />
           </div>
+          <MapResults />
         </div>
       </div>
     );
