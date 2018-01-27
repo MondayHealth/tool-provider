@@ -29,6 +29,10 @@ class Home extends Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      center: null
+    };
+
     this.providerOffset = {
       offset: 0,
       count: 100
@@ -71,6 +75,10 @@ class Home extends Component {
     }
 
     this.currentParams = params;
+
+    const newCenter =
+      "lat" in params ? { lat: params.lat, lng: params.lng } : null;
+    this.setState({ center: newCenter });
     this.props.requery(this.currentParams);
   }
 
@@ -98,7 +106,7 @@ class Home extends Component {
             />
             <ProviderResultList elements={this.props.provider.byID} />
           </div>
-          <MapResults />
+          <MapResults center={this.state.center} />
         </div>
       </div>
     );

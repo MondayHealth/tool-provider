@@ -6,6 +6,10 @@ html
   color: $pt-text-color;
 }
 
+html, body
+{
+  height: 100%;
+}
 
 .App
 {
@@ -129,14 +133,19 @@ div.home-content-container
   .map-results-container
   {
     background: $light-gray3;
-    padding: 10px;
     width: 100%;
+    overflow: hidden;
 
-    .results-map
+    .results-map-wrapper
     {
-      width: 100%;
-      max-height: 768px;
-      height: 100%;
+      width: inherit;
+      height: 500px;
+      box-shadow: 0 -2px 20px 5px $gray4;
+      .results-map
+      {
+        width: 100%;
+        height: 100%;
+      }
     }
   }
 }

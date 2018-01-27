@@ -3,7 +3,11 @@ import ReactDOM from "react-dom";
 import { connect } from "react-redux";
 import { Spinner } from "@blueprintjs/core";
 import PropTypes from "prop-types";
-import { Coordinate, generateMap } from "../../util/gmaps";
+import Map from "../../util/gmaps";
+
+function coordsEqual(c1, c2) {
+  return c1.lat === c2.lat && c1.lng === c2.lng;
+}
 
 class MapResults extends Component {
   constructor(props) {
@@ -16,12 +20,21 @@ class MapResults extends Component {
 
   loadMap() {
     const node = ReactDOM.findDOMNode(this.refs.map);
-    const map = generateMap(node, "new york");
+    this.map = new Map(node);
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (!prevProps.maps && this.props.maps) {
       this.setState({ loading: false }, () => this.loadMap());
+    }
+
+    if (this.map) {
+      if (this.props.center) {
+        this.map.center(this.props.center);
+      }
+      if (this.props.radius) {
+        this.map.circle(this.props.radius);
+      }
     }
   }
 
@@ -31,15 +44,18 @@ class MapResults extends Component {
     return (
       <div className={"map-results-container"}>
         {spinner}
-        <div ref="map" className={"results-map"} />
+        <div className={"results-map-wrapper"}>
+          <div ref="map" className={"results-map"} />
+        </div>
       </div>
     );
   }
 }
+
 MapResults.propTypes = {
   loading: PropTypes.bool,
-  center: PropTypes.instanceOf(Coordinate),
-  locations: PropTypes.arrayOf(PropTypes.instanceOf(Coordinate))
+  center: PropTypes.instanceOf(Object),
+  locations: PropTypes.arrayOf(PropTypes.instanceOf(Object))
 };
 
 const mapStateToProps = state => {

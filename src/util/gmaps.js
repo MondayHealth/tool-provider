@@ -5,17 +5,6 @@ const REJECT = Symbol();
 
 const CACHE = {};
 
-export function Coordinate(lat, lng) {
-  Object.defineProperties(this, {
-    lat: {
-      value: lat
-    },
-    lng: {
-      value: lng
-    }
-  });
-}
-
 export function geocode(address) {
   if (address in CACHE) {
     let val = CACHE[address];
@@ -68,18 +57,46 @@ export function geocode(address) {
   });
 }
 
-export function generateMap(element, c) {
-  let zoom = 14;
-  let lat = 37.774929;
-  let lng = -122.419416;
-  const center = new window.google.maps.LatLng(lat, lng);
-  const mapConfig = Object.assign(
-    {},
-    {
-      center: center,
-      zoom: zoom
-    }
-  );
+export default class Map {
+  constructor(element, center) {
+    this._zoom = 14;
+    this._center = center || { lat: 40.7127753, lng: -74.0059728 };
+    this._circle = null;
 
-  return new window.google.maps.Map(element, mapConfig);
+    const mapConfig = Object.assign(
+      {},
+      {
+        center: this._center,
+        zoom: this._zoom,
+        mapTypeControl: false,
+        streetViewControl: false,
+        mapTypeId: window.google.maps.MapTypeId.ROADMAP
+      }
+    );
+
+    this._map = new window.google.maps.Map(element, mapConfig);
+  }
+
+  center(newCenter) {
+    this._center = newCenter;
+    this._map.setCenter(this._center);
+  }
+
+  circle(radius) {
+    if (!this._circle) {
+      this._circle = new window.google.maps.Circle({
+        strokeColor: "#FF0000",
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: "#FF0000",
+        fillOpacity: 0.35,
+        map: this._map,
+        center: this._center,
+        radius: radius
+      });
+      return;
+    }
+
+    this._circle.setRadius(radius);
+  }
 }
