@@ -6,6 +6,7 @@ import ProviderResultList from "./provider-result-list";
 import PaginationEditor from "./pagination-editor";
 import FilterEditor from "./filter-editor";
 import MapResults from "./map-results";
+import { METERS_PER_MILE } from "../../util/gmaps";
 
 function shallowEquals(a, b) {
   let keys = Object.keys(a);
@@ -30,7 +31,8 @@ class Home extends Component {
     super(props);
 
     this.state = {
-      center: null
+      center: null,
+      radius: 1
     };
 
     this.providerOffset = {
@@ -41,7 +43,8 @@ class Home extends Component {
     this.filters = {
       payor: 0,
       specialty: 0,
-      coordinates: null
+      coordinates: null,
+      radius: 1
     };
 
     this.initialCount = 50;
@@ -60,6 +63,11 @@ class Home extends Component {
   reload() {
     const params = Object.assign({}, this.providerOffset, this.filters);
 
+    if (this.state.radius) {
+      this.setState({ radius: params.radius });
+      params.radius = this.state.radius * METERS_PER_MILE;
+    }
+
     // This is how we indicate that we don't wanna filter by payor
     if (params.payor < 1) {
       delete params.payor;
@@ -74,11 +82,11 @@ class Home extends Component {
       return;
     }
 
-    this.currentParams = params;
+    if ("lat" in params) {
+      this.setState({ center: { lat: params.lat, lng: params.lng } });
+    }
 
-    const newCenter =
-      "lat" in params ? { lat: params.lat, lng: params.lng } : null;
-    this.setState({ center: newCenter });
+    this.currentParams = params;
     this.props.requery(this.currentParams);
   }
 
@@ -106,7 +114,11 @@ class Home extends Component {
             />
             <ProviderResultList elements={this.props.provider.byID} />
           </div>
-          <MapResults center={this.state.center} />
+          <MapResults
+            center={this.state.center}
+            radius={this.state.radius}
+            elements={this.props.provider.byID}
+          />
         </div>
       </div>
     );

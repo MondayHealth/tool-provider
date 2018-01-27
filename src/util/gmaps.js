@@ -5,6 +5,8 @@ const REJECT = Symbol();
 
 const CACHE = {};
 
+export const METERS_PER_MILE = 1609.34;
+
 export function geocode(address) {
   if (address in CACHE) {
     let val = CACHE[address];
@@ -70,11 +72,27 @@ export default class Map {
         zoom: this._zoom,
         mapTypeControl: false,
         streetViewControl: false,
+        styles: Map.getStyles(),
         mapTypeId: window.google.maps.MapTypeId.ROADMAP
       }
     );
 
     this._map = new window.google.maps.Map(element, mapConfig);
+
+    // We're all NUMTOTS here
+    const transitLayer = new window.google.maps.TransitLayer();
+    transitLayer.setMap(this._map);
+
+    this._pins = {};
+  }
+
+  static getStyles() {
+    return [
+      {
+        featureType: "poi.business",
+        stylers: [{ visibility: "off" }]
+      }
+    ];
   }
 
   center(newCenter) {
@@ -86,17 +104,60 @@ export default class Map {
     if (!this._circle) {
       this._circle = new window.google.maps.Circle({
         strokeColor: "#FF0000",
-        strokeOpacity: 0.8,
+        strokeOpacity: 0.6,
         strokeWeight: 2,
         fillColor: "#FF0000",
-        fillOpacity: 0.35,
+        fillOpacity: 0.15,
         map: this._map,
         center: this._center,
-        radius: radius
+        radius: radius * METERS_PER_MILE
       });
+    } else {
+      this._circle.setRadius(radius * METERS_PER_MILE);
+      this._circle.setCenter(this._center);
+    }
+  }
+
+  fitToCircle() {
+    const basis = this._circle;
+    if (!basis) {
       return;
     }
+    const viewCircle = new window.google.maps.Circle({
+      center: basis.getCenter(),
+      radius: basis.getRadius() + 200
+    });
+    this._map.fitBounds(viewCircle.getBounds());
+  }
 
-    this._circle.setRadius(radius);
+  updatePins(newPins) {
+    let count = newPins.length;
+    const replacement = {};
+    for (let i = 0; i < count; i++) {
+      let pin = newPins[i];
+      let hash = `${pin.title}${pin.lat}${pin.lng}`;
+      if (hash in this._pins) {
+        replacement[hash] = this._pins[hash];
+      } else {
+        replacement[hash] = new window.google.maps.Marker({
+          position: { lat: pin.lat, lng: pin.lng },
+          map: this._map,
+          title: pin.title
+        });
+      }
+    }
+
+    const oldHashes = Object.keys(this._pins);
+    count = oldHashes.length;
+    let culled = 0;
+    for (let i = 0; i < count; i++) {
+      let current = oldHashes[i];
+      if (!replacement[current]) {
+        this._pins[current].setMap(null);
+        culled++;
+      }
+    }
+    console.log("culled", culled, "new", newPins.length);
+    this._pins = replacement;
   }
 }

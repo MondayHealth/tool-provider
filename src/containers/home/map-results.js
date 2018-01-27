@@ -5,10 +5,6 @@ import { Spinner } from "@blueprintjs/core";
 import PropTypes from "prop-types";
 import Map from "../../util/gmaps";
 
-function coordsEqual(c1, c2) {
-  return c1.lat === c2.lat && c1.lng === c2.lng;
-}
-
 class MapResults extends Component {
   constructor(props) {
     super(props);
@@ -21,6 +17,32 @@ class MapResults extends Component {
   loadMap() {
     const node = ReactDOM.findDOMNode(this.refs.map);
     this.map = new Map(node);
+    this.map.circle(this.props.radius);
+    this.map.fitToCircle();
+  }
+
+  updatePins() {
+    if (!this.map) {
+      return;
+    }
+
+    const newPins = [];
+    const elements = Object.values(this.props.elements);
+    const elementCount = elements.length;
+    for (let j = 0; j < elementCount; j++) {
+      let addresses = elements[j].addresses;
+      let count = addresses.length;
+      for (let i = 0; i < count; i++) {
+        let current = addresses[i];
+        newPins.push({
+          title: current.formatted,
+          lng: current.lng,
+          lat: current.lat
+        });
+      }
+    }
+
+    this.map.updatePins(newPins);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -29,11 +51,12 @@ class MapResults extends Component {
     }
 
     if (this.map) {
-      if (this.props.center) {
-        this.map.center(this.props.center);
-      }
-      if (this.props.radius) {
-        this.map.circle(this.props.radius);
+      this.map.center(this.props.center);
+      this.map.circle(this.props.radius);
+      this.map.fitToCircle();
+
+      if (!prevProps || this.props.elements !== prevProps.elements) {
+        this.updatePins();
       }
     }
   }
