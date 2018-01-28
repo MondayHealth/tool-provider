@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 
-const Provider = ({ k, elt, credMap, specMap }) => {
+const Provider = ({ selected, k, elt, credMap, specMap }) => {
   let globe;
 
   if (elt.websiteURL) {
@@ -23,7 +23,7 @@ const Provider = ({ k, elt, credMap, specMap }) => {
   ));
 
   return (
-    <tr key={k}>
+    <tr className={selected ? "res-selected" : ""} key={k}>
       <td className={"first-name"}>{elt.firstName}</td>
       <td className={"last-name"}>{elt.lastName}</td>
       <td className={"credentials"}>{credentials}</td>
@@ -47,8 +47,10 @@ function ProviderResultList(props) {
 
   for (let key in props.elements) {
     let elt = props.elements[key];
+    let selected = props.selected === elt.id;
     list.push(
       <Provider
+        selected={selected}
         key={key}
         elt={elt}
         credMap={props.fixtures.credentials}

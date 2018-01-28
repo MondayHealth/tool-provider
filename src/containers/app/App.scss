@@ -157,6 +157,10 @@ span.no-website
 
 tbody.results-list
 {
+  tr.res-selected {
+    background-color: lighten($forest5, 25%);
+  }
+
   td.first-name
   {
     max-width: 128px;

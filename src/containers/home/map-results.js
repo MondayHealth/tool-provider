@@ -16,9 +16,8 @@ class MapResults extends Component {
 
   loadMap() {
     const node = ReactDOM.findDOMNode(this.refs.map);
-    this.map = new Map(node);
-    this.map.circle(this.props.radius);
-    this.map.fitToCircle();
+    this.map = new Map(node, null);
+    this.map.setMouseOverFunction(this.props.mouseOverHandler);
   }
 
   updatePins() {
@@ -31,11 +30,12 @@ class MapResults extends Component {
     const elementCount = elements.length;
     for (let j = 0; j < elementCount; j++) {
       let addresses = elements[j].addresses;
+      let id = elements[j].id;
       let count = addresses.length;
       for (let i = 0; i < count; i++) {
         let current = addresses[i];
         newPins.push({
-          title: current.formatted,
+          id: id,
           lng: current.lng,
           lat: current.lat
         });
@@ -50,11 +50,10 @@ class MapResults extends Component {
       this.setState({ loading: false }, () => this.loadMap());
     }
 
-    if (this.map) {
+    if (this.map && this.props.center) {
       this.map.center(this.props.center);
       this.map.circle(this.props.radius);
       this.map.fitToCircle();
-
       if (!prevProps || this.props.elements !== prevProps.elements) {
         this.updatePins();
       }
@@ -78,7 +77,8 @@ class MapResults extends Component {
 MapResults.propTypes = {
   loading: PropTypes.bool,
   center: PropTypes.instanceOf(Object),
-  locations: PropTypes.arrayOf(PropTypes.instanceOf(Object))
+  locations: PropTypes.arrayOf(PropTypes.instanceOf(Object)),
+  mouseOverHandler: PropTypes.func.isRequired
 };
 
 const mapStateToProps = state => {

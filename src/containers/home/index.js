@@ -32,7 +32,8 @@ class Home extends Component {
 
     this.state = {
       center: null,
-      radius: 1
+      radius: 1,
+      selectedID: null
     };
 
     this.providerOffset = {
@@ -51,6 +52,7 @@ class Home extends Component {
 
     this.offsetChanged = this.offsetChanged.bind(this);
     this.filtersChanged = this.filtersChanged.bind(this);
+    this.mapMouseOver = this.mapMouseOver.bind(this);
 
     this.currentParams = {};
   }
@@ -101,6 +103,10 @@ class Home extends Component {
     this.reload();
   }
 
+  mapMouseOver(id) {
+    this.setState({ selectedID: id });
+  }
+
   render() {
     return (
       <div>
@@ -112,12 +118,16 @@ class Home extends Component {
               initialCount={this.initialCount}
               onOffsetChanged={this.offsetChanged}
             />
-            <ProviderResultList elements={this.props.provider.byID} />
+            <ProviderResultList
+              elements={this.props.provider.byID}
+              selected={this.state.selectedID}
+            />
           </div>
           <MapResults
             center={this.state.center}
             radius={this.state.radius}
             elements={this.props.provider.byID}
+            mouseOverHandler={this.mapMouseOver}
           />
         </div>
       </div>

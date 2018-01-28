@@ -25,7 +25,7 @@ class App extends Component {
     console.assert(!this.googleMapsScript, "Double install.");
 
     const KEY = "AIzaSyAtGlev0oDtHGc3DSZZfkjZZyMzje5zUEg";
-    const PARAMS = `key=${KEY}&callback=${MAP_INIT_CB_NAME}`;
+    const PARAMS = `key=${KEY}&callback=${MAP_INIT_CB_NAME}&libraries=geometry`;
     const script = document.createElement("script");
 
     script.defer = true;

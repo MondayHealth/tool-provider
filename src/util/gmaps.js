@@ -84,6 +84,9 @@ export default class Map {
     transitLayer.setMap(this._map);
 
     this._pins = {};
+
+    this._mouseOverHandler = null;
+    this.mouseOverProxy = this.mouseOverProxy.bind(this);
   }
 
   static getStyles() {
@@ -98,6 +101,16 @@ export default class Map {
   center(newCenter) {
     this._center = newCenter;
     this._map.setCenter(this._center);
+  }
+
+  setMouseOverFunction(newFunction) {
+    this._mouseOverHandler = newFunction;
+  }
+
+  mouseOverProxy(id) {
+    if (this._mouseOverHandler) {
+      this._mouseOverHandler(id);
+    }
   }
 
   circle(radius) {
@@ -119,45 +132,58 @@ export default class Map {
   }
 
   fitToCircle() {
-    const basis = this._circle;
-    if (!basis) {
+    if (this._circle === null) {
       return;
     }
+
     const viewCircle = new window.google.maps.Circle({
-      center: basis.getCenter(),
-      radius: basis.getRadius() + 200
+      center: this._circle.getCenter(),
+      radius: this._circle.getRadius() + 200
     });
     this._map.fitBounds(viewCircle.getBounds());
   }
 
   updatePins(newPins) {
+    const center = this._circle.getCenter();
+    const radius = this._circle.getRadius();
+    const distance =
+      window.google.maps.geometry.spherical.computeDistanceBetween;
+
     let count = newPins.length;
     const replacement = {};
     for (let i = 0; i < count; i++) {
       let pin = newPins[i];
-      let hash = `${pin.title}${pin.lat}${pin.lng}`;
-      if (hash in this._pins) {
+      let hash = `${pin.id}${pin.lat}${pin.lng}`;
+      let id = pin.id;
+      let loc = new window.google.maps.LatLng(pin.lat, pin.lng);
+      let dist = distance(center, loc);
+
+      if (dist > radius) {
+        continue;
+      }
+
+      if (this._pins[hash]) {
         replacement[hash] = this._pins[hash];
       } else {
         replacement[hash] = new window.google.maps.Marker({
-          position: { lat: pin.lat, lng: pin.lng },
-          map: this._map,
-          title: pin.title
+          position: loc,
+          map: this._map
         });
+
+        replacement[hash].addListener("mouseover", () =>
+          this.mouseOverProxy(id)
+        );
       }
     }
 
     const oldHashes = Object.keys(this._pins);
     count = oldHashes.length;
-    let culled = 0;
     for (let i = 0; i < count; i++) {
       let current = oldHashes[i];
       if (!replacement[current]) {
         this._pins[current].setMap(null);
-        culled++;
       }
     }
-    console.log("culled", culled, "new", newPins.length);
     this._pins = replacement;
   }
 }
