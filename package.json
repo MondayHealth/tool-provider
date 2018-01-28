@@ -9,7 +9,7 @@
     "react": "^16.2.0",
     "react-addons-css-transition-group": "^15.6.2",
     "react-dom": "^16.2.0",
-    "react-scripts": "1.0.17"
+    "react-scripts": "1.1.0"
   },
   "scripts": {
     "build-css": "node-sass-chokidar --importer node_modules/node-sass-tilde-importer/index.js --include-path ./src src/ -o src/",
