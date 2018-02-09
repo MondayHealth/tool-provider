@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Route } from "react-router-dom";
 import "./App.css";
+import Detail from "../detail";
 import About from "../about";
 import Home from "../home";
 import Header from "../header";
@@ -56,6 +57,7 @@ class App extends Component {
         <main>
           <Route exact path="/" component={Home} />
           <Route exact path="/about" component={About} />
+          <Route path="/detail/:id" component={Detail} />
         </main>
       </div>
     );

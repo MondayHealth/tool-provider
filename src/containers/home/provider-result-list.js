@@ -1,7 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 
-const Provider = ({ selected, k, elt, credMap, specMap }) => {
+const Provider = ({ selected, k, elt, fixtures }) => {
   let globe;
 
   if (elt.websiteURL) {
@@ -15,32 +15,34 @@ const Provider = ({ selected, k, elt, credMap, specMap }) => {
   }
 
   let credentials = elt.credentials.map((value, idx) => (
-    <span key={idx}>{value in credMap ? credMap[value] : value}</span>
+    <span key={idx}>{fixtures.credentials[value]}</span>
   ));
 
   let specialties = elt.specialties.map((value, idx) => (
-    <span key={idx}>{value in specMap ? specMap[value] : value}</span>
+    <span key={idx}>{fixtures.specialties[value]}</span>
+  ));
+
+  let degrees = elt.degrees.map((value, idx) => (
+    <span key={idx}>{fixtures.degrees[value]}</span>
   ));
 
   return (
-    <tr className={selected ? "res-selected" : ""} key={k}>
-      <td className={"first-name"}>{elt.firstName}</td>
-      <td className={"last-name"}>{elt.lastName}</td>
-      <td className={"credentials"}>{credentials}</td>
-      <td className={"specialties"}>{specialties}</td>
+    <div className={selected ? "res-selected" : ""} key={k}>
+      <span className={"name"}>
+        {elt.firstName} {elt.lastName}
+      </span>
+      <div className={"degrees"}>{degrees}</div>
+      <div className={"credentials"}>{credentials}</div>
+      <div className={"specialties"}>{specialties}</div>
       <td className={"links"}>
         {globe}
         <a rel="noopener noreferrer" target="_blank" href="https://google.com/">
           <span className={"pt-icon-person"} />
         </a>
       </td>
-    </tr>
+    </div>
   );
 };
-
-const COLUMNS = ["First Name", "Last Name", "Credential", "Specialty", ""];
-
-const COLUMN_ELEMENTS = COLUMNS.map(val => <th key={val}>{val}</th>);
 
 function ProviderResultList(props) {
   const list = [];
@@ -53,22 +55,12 @@ function ProviderResultList(props) {
         selected={selected}
         key={key}
         elt={elt}
-        credMap={props.fixtures.credentials}
-        specMap={props.fixtures.specialties}
+        fixtures={props.fixtures}
       />
     );
   }
 
-  return (
-    <div className="provider-result-list">
-      <table className="pt-table pt-striped pt-interactive">
-        <thead>
-          <tr>{COLUMN_ELEMENTS}</tr>
-        </thead>
-        <tbody className={"results-list"}>{list}</tbody>
-      </table>
-    </div>
-  );
+  return <div className="provider-result-list">{list}</div>;
 }
 
 const mapStateToProps = state => {
