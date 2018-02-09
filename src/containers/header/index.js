@@ -1,18 +1,28 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import {
-  credentialsFixture, hello,
-  payorsFixture, specialtiesFixture
-} from "../../state/api/actions";
+import { hello, loadFixtureByName } from "../../state/api/actions";
 
 const APP_NAME = "Provider";
+
+const FIXTURES = [
+  "credentials",
+  "payors",
+  "paymenttypes",
+  "modalities",
+  "languages",
+  "degrees",
+  "specialties",
+  "directories",
+  "plans",
+  "licensors"
+];
 
 class Header extends Component {
   componentWillMount() {
     this.props.loadUserState();
-    this.props.loadPayorsFixture();
-    this.props.loadCredentialsFixture();
-    this.props.loadSpecialtiesFixture();
+
+    // Load ALL the fixtures
+    FIXTURES.forEach(x => this.props.loadFixture(x));
   }
 
   render() {
@@ -32,9 +42,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     loadUserState: hello(dispatch),
-    loadPayorsFixture: payorsFixture(dispatch),
-    loadCredentialsFixture: credentialsFixture(dispatch),
-    loadSpecialtiesFixture: specialtiesFixture(dispatch)
+    loadFixture: loadFixtureByName(dispatch)
   };
 };
 

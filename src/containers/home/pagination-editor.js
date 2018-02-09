@@ -14,7 +14,7 @@ class PaginationEditor extends Component {
     this.countChanged = this.countChanged.bind(this);
     this.pageChanged = this.pageChanged.bind(this);
 
-    this.options = [25, 50, 100].map(value => (
+    this.options = [15, 25].map(value => (
       <option key={value} value={value}>
         {value}
       </option>

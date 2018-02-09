@@ -17,12 +17,6 @@ function googleMapsLoadedAction() {
 
 export const REQUEST_HELLO = "tx:hello";
 export const RECEIVE_HELLO = "rx:hello";
-export const REQUEST_SPECIALTIES_FIXTURE = "tx:fixtures/specialties";
-export const RECEIVE_SPECIALTIES_FIXTURE = "rx:fixtures/specialties";
-export const REQUEST_CREDENTIALS_FIXTURE = "tx:fixtures/credentials";
-export const RECEIVE_CREDENTIALS_FIXTURE = "rx:fixtures/credentials";
-export const REQUEST_PAYORS_FIXTURE = "tx:fixtures/payors";
-export const RECEIVE_PAYORS_FIXTURE = "rx:fixtures/payors";
 export const REQUEST_PROVIDER_RECORD_COUNT = "tx:providers/count";
 export const RECEIVE_PROVIDER_RECORD_COUNT = "rx:providers/count";
 export const REQUEST_PROVIDER_RECORD_LIST = "tx:providers/list";
@@ -76,11 +70,25 @@ function generate(endpoint) {
   };
 }
 
-export const payorsFixture = generate("fixtures/payors");
+export function loadFixtureByName(dispatch) {
+  return function(fixtureName) {
+    let endpoint = "fixtures/" + fixtureName;
+    dispatch(txAction(endpoint));
 
-export const credentialsFixture = generate("fixtures/credentials");
-
-export const specialtiesFixture = generate("fixtures/specialties");
+    return fetch(apiURL(endpoint))
+      .then(
+        response => response.json(),
+        error => console.error(endpoint, error)
+      )
+      .then(json =>
+        dispatch(
+          json.success
+            ? rxAction(endpoint, json.result)
+            : requestError(endpoint)
+        )
+      );
+  };
+}
 
 export const hello = generate("hello");
 

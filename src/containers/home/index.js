@@ -38,7 +38,7 @@ class Home extends Component {
 
     this.providerOffset = {
       offset: 0,
-      count: 100
+      count: 25
     };
 
     this.filters = {

@@ -1,11 +1,8 @@
 import {
   GOOGLE_MAPS_LOADED,
-  RECEIVE_CREDENTIALS_FIXTURE,
   RECEIVE_HELLO,
-  RECEIVE_PAYORS_FIXTURE,
   RECEIVE_PROVIDER_RECORD_COUNT,
-  RECEIVE_PROVIDER_RECORD_LIST,
-  RECEIVE_SPECIALTIES_FIXTURE
+  RECEIVE_PROVIDER_RECORD_LIST
 } from "./actions";
 
 // noinspection JSUnusedGlobalSymbols
@@ -87,20 +84,23 @@ function generateIntKeyDictionary(data) {
 
 // noinspection JSUnusedGlobalSymbols
 export function fixtures(state = initialFixturesState, action) {
-  switch (action.type) {
-    case RECEIVE_PAYORS_FIXTURE:
+  if (
+    !action.type ||
+    action.type.substr(3, 9) !== "fixtures/" ||
+    action.type.substr(0, 2) === "tx"
+  ) {
+    return state;
+  }
+
+  const fixture = action.type.split("/")[1];
+
+  switch (fixture) {
+    case "payors":
       return { ...state, payors: generatePayorArray(action.result) };
-    case RECEIVE_CREDENTIALS_FIXTURE:
-      return {
-        ...state,
-        credentials: generateIntKeyDictionary(action.result)
-      };
-    case RECEIVE_SPECIALTIES_FIXTURE:
-      return {
-        ...state,
-        specialties: generateIntKeyDictionary(action.result)
-      };
     default:
-      return state;
+      return {
+        ...state,
+        [fixture]: generateIntKeyDictionary(action.result)
+      };
   }
 }
