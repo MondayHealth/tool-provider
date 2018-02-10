@@ -15,11 +15,8 @@ function googleMapsLoadedAction() {
   return { type: GOOGLE_MAPS_LOADED };
 }
 
-export const REQUEST_HELLO = "tx:hello";
 export const RECEIVE_HELLO = "rx:hello";
-export const REQUEST_PROVIDER_RECORD_COUNT = "tx:providers/count";
 export const RECEIVE_PROVIDER_RECORD_COUNT = "rx:providers/count";
-export const REQUEST_PROVIDER_RECORD_LIST = "tx:providers/list";
 export const RECEIVE_PROVIDER_RECORD_LIST = "rx:providers/list";
 
 function rxAction(endpoint, result) {
@@ -73,6 +70,26 @@ function generate(endpoint) {
 export function loadFixtureByName(dispatch) {
   return function(fixtureName) {
     let endpoint = "fixtures/" + fixtureName;
+    dispatch(txAction(endpoint));
+
+    return fetch(apiURL(endpoint))
+      .then(
+        response => response.json(),
+        error => console.error(endpoint, error)
+      )
+      .then(json =>
+        dispatch(
+          json.success
+            ? rxAction(endpoint, json.result)
+            : requestError(endpoint)
+        )
+      );
+  };
+}
+
+export function loadDetailByID(dispatch) {
+  return function(id) {
+    let endpoint = "providers/detail/" + parseInt(id, 10);
     dispatch(txAction(endpoint));
 
     return fetch(apiURL(endpoint))

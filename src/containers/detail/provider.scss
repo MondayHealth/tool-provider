@@ -1,0 +1,57 @@
+
+@import "../../../node_modules/@blueprintjs/core/dist/variables";
+
+#name
+{
+  position: relative;
+
+  margin-bottom: 10px;
+
+  h3, h5
+  {
+    float: left;
+    margin: 0 5px 0 0;
+  }
+
+  #gender
+  {
+    color: $gray4;
+    font-weight: 900;
+    margin-top: 10px;
+  }
+
+  #first
+  {
+    color: $gray1;
+  }
+
+  #last
+  {
+    color: $dark-gray1;
+  }
+
+  span.pt-icon-standard
+  {
+    margin-top: 4px;
+    margin-left: 2px;
+    margin-right: 2px;
+  }
+
+  span.icon-on
+  {
+    color: $pt-intent-success;
+  }
+
+  span.icon-off
+  {
+    color: $gray4;
+  }
+
+  #id
+  {
+    color: $light-gray1;
+    margin-left: 7px;
+  }
+
+}
+

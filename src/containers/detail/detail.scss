@@ -1,0 +1,77 @@
+@import "../../../node_modules/@blueprintjs/core/dist/variables";
+
+div.provider-detail
+{
+  padding: 15px;
+
+  .line-item-undefined, .line-list-empty
+  {
+    color: $light-gray1;
+  }
+
+  #addresses
+  {
+    .address-item
+    {
+      background-color: $light-gray1;
+      padding: 5px;
+      width: 100%;
+      display: inline-block;
+
+      div
+      {
+        float: left;
+        margin-right: 10px;
+      }
+
+      .address-meta
+      {
+        span
+        {
+          color: $gray3;
+          margin-right: 10px;
+        }
+      }
+    }
+  }
+
+  .line-list
+  {
+    div
+    {
+      padding: 5px;
+      span
+      {
+        background-color: $light-gray1;
+        margin-right: 7px;
+        margin-bottom: 5px;
+        padding-left: 4px;
+        padding-right: 4px;
+        border-radius: 5px;
+        display: inline-block;
+      }
+    }
+  }
+
+  .fixture-list
+  {
+    div
+    {
+      span
+      {
+        background-color: $light-gray1;
+      }
+    }
+  }
+
+  .string-list
+  {
+    div
+    {
+      span
+      {
+        background-color: $light-gray3;
+      }
+    }
+  }
+}

@@ -104,3 +104,12 @@ export function fixtures(state = initialFixturesState, action) {
       };
   }
 }
+
+// noinspection JSUnusedGlobalSymbols
+export function detail(state = {}, action) {
+  if (!action.type || action.type.substr(0, 19) !== "rx:providers/detail") {
+    return state;
+  }
+
+  return action.result;
+}

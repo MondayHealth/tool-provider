@@ -1,6 +1,8 @@
 import React from "react";
 import { connect } from "react-redux";
 
+import { ProviderName } from "../detail";
+
 const Provider = ({ selected, k, elt, fixtures }) => {
   let globe;
 
@@ -28,15 +30,13 @@ const Provider = ({ selected, k, elt, fixtures }) => {
 
   return (
     <div className={selected ? "res-selected" : ""} key={k}>
-      <span className={"name"}>
-        {elt.firstName} {elt.lastName}
-      </span>
+      <ProviderName elt={elt} />
       <div className={"degrees"}>{degrees}</div>
       <div className={"credentials"}>{credentials}</div>
       <div className={"specialties"}>{specialties}</div>
       <td className={"links"}>
         {globe}
-        <a rel="noopener noreferrer" target="_blank" href="https://google.com/">
+        <a rel="noopener noreferrer" target="_blank" href={"/detail/" + elt.id}>
           <span className={"pt-icon-person"} />
         </a>
       </td>
