@@ -122,10 +122,71 @@ div.home-content-container
 
     }
 
+
     .provider-result-list
     {
       width: 100%;
-      padding: 10px;
+
+      .result-wrapper:nth-child(even)
+      {
+        .result-element
+        {
+          background-color: $light-gray4;
+        }
+
+        .result-element:hover
+        {
+          background-color: $light-gray3;
+        }
+      }
+
+      #first
+      {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 150px;
+        overflow: hidden;
+      }
+
+      .result-wrapper
+      {
+        text-decoration: none;
+      }
+
+      .result-element
+      {
+        padding: 5px 10px;
+        height: 90px;
+
+        .provider-name-display
+        {
+          margin-bottom: 5px;
+        }
+
+        .credentials
+        {
+          span
+          {
+            margin-right: 5px;
+            color: $gray3;
+            background-color: $light-gray3;
+          }
+        }
+
+        .specialties, .orientations
+        {
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          width: 450px;
+          overflow: hidden;
+          color: $gray1;
+        }
+      }
+
+      .result-element:hover
+      {
+        background-color: $light-gray3;
+      }
     }
   }
 
@@ -152,47 +213,5 @@ div.home-content-container
 span.no-website
 {
   color: $gray5;
-}
-
-tbody.results-list
-{
-  tr.res-selected {
-    background-color: lighten($forest5, 25%);
-  }
-
-  td.first-name
-  {
-    max-width: 128px;
-  }
-
-  td.last-name
-  {
-    max-width: 128px;
-  }
-  td.credentials
-  {
-    span
-    {
-      font-size: 12px;
-      color: $gray1;
-      background-color: $light-gray2;
-      margin-right: 5px;
-    }
-  }
-  td.specialties
-  {
-    max-width: 256px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-    span
-    {
-      font-size: 12px;
-      color: $gray1;
-      background-color: $light-gray2;
-      margin-right: 5px;
-    }
-  }
 }
 

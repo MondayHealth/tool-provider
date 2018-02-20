@@ -118,3 +118,14 @@ export function googleMapsLoaded(dispatch) {
     dispatch(googleMapsLoadedAction());
   };
 }
+
+export const SELECT_PROVIDER_DETAIL = "SELECT_PROVIDER_DETAIL";
+
+export function selectProviderDetail(dispatch) {
+  return function(id) {
+    dispatch({
+      type: SELECT_PROVIDER_DETAIL,
+      id: id
+    });
+  };
+}

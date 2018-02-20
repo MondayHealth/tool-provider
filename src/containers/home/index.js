@@ -7,6 +7,7 @@ import PaginationEditor from "./pagination-editor";
 import FilterEditor from "./filter-editor";
 import MapResults from "./map-results";
 import { METERS_PER_MILE } from "../../util/gmaps";
+import ProviderDetail from "../detail/provider-detail";
 
 function shallowEquals(a, b) {
   let keys = Object.keys(a);
@@ -129,6 +130,7 @@ class Home extends Component {
             elements={this.props.provider.byID}
             mouseOverHandler={this.mapMouseOver}
           />
+          <ProviderDetail />
         </div>
       </div>
     );
