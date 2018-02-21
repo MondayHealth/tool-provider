@@ -124,13 +124,16 @@ class Home extends Component {
               selected={this.state.selectedID}
             />
           </div>
-          <MapResults
-            center={this.state.center}
-            radius={this.state.radius}
-            elements={this.props.provider.byID}
-            mouseOverHandler={this.mapMouseOver}
-          />
-          <ProviderDetail />
+
+          <div className={"side-bar-container"}>
+            <MapResults
+              center={this.state.center}
+              radius={this.state.radius}
+              elements={this.props.provider.byID}
+              mouseOverHandler={this.mapMouseOver}
+            />
+            <ProviderDetail />
+          </div>
         </div>
       </div>
     );

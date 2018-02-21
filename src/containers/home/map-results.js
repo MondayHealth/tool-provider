@@ -61,14 +61,13 @@ class MapResults extends Component {
   }
 
   render() {
-    const spinner = this.state.loading ? <Spinner /> : null;
+    if (this.state.loading) {
+      return <Spinner />;
+    }
 
     return (
-      <div className={"map-results-container"}>
-        {spinner}
-        <div className={"results-map-wrapper"}>
-          <div ref="map" className={"results-map"} />
-        </div>
+      <div className={"results-map-wrapper"}>
+        <div ref="map" className={"results-map"} />
       </div>
     );
   }

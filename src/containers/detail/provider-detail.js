@@ -148,7 +148,6 @@ class ProviderDetail extends Component {
     };
   }
   componentWillReceiveProps(next) {
-    console.log(next);
     if (next && this.props.detail !== next.detail) {
       this.setState({ detail: next.detail });
     }
