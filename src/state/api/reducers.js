@@ -2,8 +2,7 @@ import {
   GOOGLE_MAPS_LOADED,
   RECEIVE_HELLO,
   RECEIVE_PROVIDER_RECORD_COUNT,
-  RECEIVE_PROVIDER_RECORD_LIST,
-  SELECT_PROVIDER_DETAIL
+  RECEIVE_PROVIDER_RECORD_LIST
 } from "./actions";
 
 // noinspection JSUnusedGlobalSymbols
@@ -113,14 +112,4 @@ export function detail(state = {}, action) {
   }
 
   return action.result;
-}
-
-// noinspection JSUnusedGlobalSymbols
-export function selectDetail(state = { selectedProviderID: null }, action) {
-  switch (action.type) {
-    case SELECT_PROVIDER_DETAIL:
-      return { ...state, selectedProviderID: action.id };
-    default:
-      return state;
-  }
 }

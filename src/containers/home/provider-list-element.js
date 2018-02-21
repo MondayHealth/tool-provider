@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import ProviderName from "../detail/provider-name";
-import { selectProviderDetail } from "../../state/api/actions";
+import { loadDetailByID } from "../../state/api/actions";
 
 class ProviderListElement extends Component {
   constructor(props) {
@@ -57,7 +57,7 @@ class ProviderListElement extends Component {
 
 const mapDispatchToProps = dispatch => {
   return {
-    setDetailID: selectProviderDetail(dispatch)
+    setDetailID: loadDetailByID(dispatch)
   };
 };
 
