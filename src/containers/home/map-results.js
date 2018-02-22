@@ -54,9 +54,10 @@ class MapResults extends Component {
       this.map.center(this.props.center);
       this.map.circle(this.props.radius);
       this.map.fitToCircle();
-      if (!prevProps || this.props.elements !== prevProps.elements) {
-        this.updatePins();
-      }
+    }
+
+    if (!prevProps || this.props.elements !== prevProps.elements) {
+      this.updatePins();
     }
   }
 

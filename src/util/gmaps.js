@@ -86,7 +86,6 @@ export default class Map {
     this._pins = {};
 
     this._mouseOverHandler = null;
-    this.mouseOverProxy = this.mouseOverProxy.bind(this);
   }
 
   static getStyles() {
@@ -105,12 +104,6 @@ export default class Map {
 
   setMouseOverFunction(newFunction) {
     this._mouseOverHandler = newFunction;
-  }
-
-  mouseOverProxy(id) {
-    if (this._mouseOverHandler) {
-      this._mouseOverHandler(id);
-    }
   }
 
   circle(radius) {
@@ -144,35 +137,46 @@ export default class Map {
   }
 
   updatePins(newPins) {
-    const center = this._circle.getCenter();
-    const radius = this._circle.getRadius();
+    const center = this._circle ? this._circle.getCenter() : null;
+    const radius = this._circle ? this._circle.getRadius() : null;
     const distance =
       window.google.maps.geometry.spherical.computeDistanceBetween;
+
+    const callback = this._mouseOverHandler;
 
     let count = newPins.length;
     const replacement = {};
     for (let i = 0; i < count; i++) {
       let pin = newPins[i];
-      let hash = `${pin.id}${pin.lat}${pin.lng}`;
+      let hash = `${pin.lat}${pin.lng}`;
       let id = pin.id;
       let loc = new window.google.maps.LatLng(pin.lat, pin.lng);
-      let dist = distance(center, loc);
 
-      if (dist > radius) {
-        continue;
+      if (this._circle) {
+        if (distance(center, loc) > radius) {
+          continue;
+        }
       }
 
-      if (this._pins[hash]) {
+      if (replacement[hash]) {
+        replacement[hash].ids.add(id);
+      } else if (this._pins[hash]) {
         replacement[hash] = this._pins[hash];
+        replacement[hash].ids = new Set([id]);
       } else {
-        replacement[hash] = new window.google.maps.Marker({
+        const newMarker = new window.google.maps.Marker({
           position: loc,
           map: this._map
         });
 
-        replacement[hash].addListener("mouseover", () =>
-          this.mouseOverProxy(id)
-        );
+        newMarker.ids = new Set([id]);
+        newMarker.addListener("mouseover", () => {
+          if (callback) {
+            callback(newMarker.ids);
+          }
+        });
+
+        replacement[hash] = newMarker;
       }
     }
 
