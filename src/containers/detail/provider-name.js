@@ -35,7 +35,9 @@ const ProviderName = ({ elt }) => {
       <BoolIcon value={elt.freeConsultation} icon={"help"} />
       {globe}
 
-      <span id={"id"}>{elt.id}</span>
+      <a rel="noopener noreferrer" target="_blank" href={`/detail/${elt.id}`}>
+        {elt.id}
+      </a>
     </div>
   );
 };
