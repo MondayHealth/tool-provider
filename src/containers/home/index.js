@@ -46,7 +46,9 @@ class Home extends Component {
       payor: 0,
       specialty: 0,
       coordinates: null,
-      radius: 1
+      radius: 1,
+      gender: 0,
+      language: 0
     };
 
     this.initialCount = 50;
@@ -78,6 +80,14 @@ class Home extends Component {
 
     if (params.specialty < 1) {
       delete params.specialty;
+    }
+
+    if (params.gender < 1) {
+      delete params.gender;
+    }
+
+    if (params.language < 1) {
+      delete params.language;
     }
 
     // Don't do anything if the params haven't changed

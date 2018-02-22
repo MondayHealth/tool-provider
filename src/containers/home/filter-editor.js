@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { TopToaster } from "../../toaster";
-import { Intent, Slider, Spinner } from "@blueprintjs/core";
+import { Intent, RangeSlider, Slider, Spinner } from "@blueprintjs/core";
 import { geocode } from "../../util/gmaps";
 
 class FilterEditor extends Component {
@@ -11,19 +11,40 @@ class FilterEditor extends Component {
     this.state = {
       payor: "0",
       specialty: "0",
+      gender: "0",
+      language: "0",
+      modality: "0",
+      feeRange: [0, 500],
       processingAddress: false,
       addressInputValue: "",
       coordinate: null,
       addressInputValidity: null,
-      radius: 1
+      radius: 1,
+      contact: false
     };
 
     this.lastAddressSearched = "";
 
     this.payorOptions = [];
     this.specialtyOptions = [];
+    this.languageOptions = [];
+    this.modalityOptions = [];
+    this.regenerateLanguageOptions(this.props);
     this.regeneratePayorOptions(this.props);
     this.regenerateSpecialtyOptions(this.props);
+    this.regenerateModalityOptions(this.props);
+
+    this.genderOptions = [
+      <option key={"0"} value={"0"}>
+        None
+      </option>,
+      <option key={"1"} value={"1"}>
+        Female
+      </option>,
+      <option key={"2"} value={"2"}>
+        Male
+      </option>
+    ];
 
     this.insuranceSelectChanged = this.insuranceSelectChanged.bind(this);
     this.specialtySelectChanged = this.specialtySelectChanged.bind(this);
@@ -33,6 +54,12 @@ class FilterEditor extends Component {
     this.geocodeResponse = this.geocodeResponse.bind(this);
     this.radiusSliderChange = this.radiusSliderChange.bind(this);
     this.radiusSliderReleased = this.radiusSliderReleased.bind(this);
+    this.genderSelectChanged = this.genderSelectChanged.bind(this);
+    this.contactInfoChanged = this.contactInfoChanged.bind(this);
+    this.languageSelectChanged = this.languageSelectChanged.bind(this);
+    this.feeRangeSliderChange = this.feeRangeSliderChange.bind(this);
+    this.feeRangeSliderReleased = this.feeRangeSliderReleased.bind(this);
+    this.modalitySelectChanged = this.modalitySelectChanged.bind(this);
   }
 
   regeneratePayorOptions(props) {
@@ -49,6 +76,40 @@ class FilterEditor extends Component {
     );
   }
 
+  regenerateLanguageOptions(props) {
+    if (props.fixtures.languages) {
+      this.languageOptions = Object.entries(props.fixtures.languages).map(
+        ([index, value]) => (
+          <option key={index} value={index}>
+            {value}
+          </option>
+        )
+      );
+    }
+
+    this.languageOptions.unshift(
+      <option key={"0"} value="0">
+        None
+      </option>
+    );
+  }
+
+  regenerateModalityOptions(props) {
+    if (props.fixtures.modalities) {
+      this.modalityOptions = Object.entries(props.fixtures.modalities).map(
+        ([index, value]) => (
+          <option key={index} value={index}>
+            {value}
+          </option>
+        )
+      );
+    }
+    this.modalityOptions.unshift(
+      <option key={"0"} value="0">
+        None
+      </option>
+    );
+  }
   regenerateSpecialtyOptions(props) {
     this.specialtyOptions = Object.entries(props.fixtures.specialties).map(
       ([index, value]) => (
@@ -71,14 +132,28 @@ class FilterEditor extends Component {
     if (this.props.fixtures.specialties !== nextProps.fixtures.specialties) {
       this.regenerateSpecialtyOptions(nextProps);
     }
+    if (this.props.fixtures.languages !== nextProps.fixtures.languages) {
+      this.regenerateLanguageOptions(nextProps);
+    }
+    if (this.props.fixtures.modalities !== nextProps.fixtures.modalities) {
+      this.regenerateModalityOptions(nextProps);
+    }
   }
 
   filterStateHasChanged() {
     const newFilterState = {
       payor: this.state.payor,
       specialty: this.state.specialty,
-      radius: this.state.radius
+      radius: this.state.radius,
+      gender: this.state.gender,
+      contact: this.state.contact,
+      language: this.state.language
     };
+
+    let [min, max] = this.state.feeRange;
+    if (min !== 0 || max !== 500) {
+      newFilterState.feeRange = `${min},${max}`;
+    }
 
     if (this.state.coordinates) {
       newFilterState.lat = this.state.coordinates.lat;
@@ -100,12 +175,25 @@ class FilterEditor extends Component {
     );
   }
 
+  modalitySelectChanged(elt) {
+    this.setState({ modality: elt.target.value }, () =>
+      this.filterStateHasChanged()
+    );
+  }
   radiusSliderChange(value) {
     this.setState({ radius: value });
   }
 
   radiusSliderReleased(value) {
     this.setState({ radius: value }, () => this.filterStateHasChanged());
+  }
+
+  feeRangeSliderChange(value) {
+    this.setState({ feeRange: value });
+  }
+
+  feeRangeSliderReleased(value) {
+    this.setState({ feeRange: value }, () => this.filterStateHasChanged());
   }
 
   addressChanged(newVal) {
@@ -156,6 +244,24 @@ class FilterEditor extends Component {
         }
       },
       () => this.filterStateHasChanged()
+    );
+  }
+
+  genderSelectChanged(evt) {
+    this.setState({ gender: evt.target.value }, () =>
+      this.filterStateHasChanged()
+    );
+  }
+
+  languageSelectChanged(evt) {
+    this.setState({ language: evt.target.value }, () =>
+      this.filterStateHasChanged()
+    );
+  }
+
+  contactInfoChanged(evt) {
+    this.setState({ contact: evt.target.checked }, () =>
+      this.filterStateHasChanged()
     );
   }
 
@@ -223,6 +329,21 @@ class FilterEditor extends Component {
           </div>
         </label>
 
+        <label className={"pt-label"}>
+          Fee Range
+          <div className={"slider-container"}>
+            <RangeSlider
+              min={0}
+              max={500}
+              stepSize={10}
+              labelStepSize={150}
+              value={this.state.feeRange}
+              onChange={this.feeRangeSliderChange}
+              onRelease={this.feeRangeSliderReleased}
+            />
+          </div>
+        </label>
+
         <label className="pt-label">
           Payor
           <div className="pt-select">
@@ -247,8 +368,48 @@ class FilterEditor extends Component {
           </div>
         </label>
 
+        <label className="pt-label">
+          Modality
+          <div className="pt-select">
+            <select
+              defaultValue={this.state.modality}
+              onChange={this.modalitySelectChanged}
+            >
+              {this.modalityOptions}
+            </select>
+          </div>
+        </label>
+
+        <label className="pt-label">
+          Gender
+          <div className="pt-select">
+            <select
+              defaultValue={this.state.gender}
+              onChange={this.genderSelectChanged}
+            >
+              {this.genderOptions}
+            </select>
+          </div>
+        </label>
+
+        <label className="pt-label">
+          Language
+          <div className="pt-select">
+            <select
+              defaultValue={this.state.language}
+              onChange={this.languageSelectChanged}
+            >
+              {this.languageOptions}
+            </select>
+          </div>
+        </label>
+
         <label className="pt-control pt-checkbox pt-large">
-          <input type="checkbox" />
+          <input
+            type="checkbox"
+            defaultValue={this.state.contact}
+            onChange={this.contactInfoChanged}
+          />
           <span className="pt-control-indicator" />
           Has Contact Info
         </label>
