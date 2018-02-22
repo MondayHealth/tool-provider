@@ -146,7 +146,7 @@ class FilterEditor extends Component {
       specialty: this.state.specialty,
       radius: this.state.radius,
       gender: this.state.gender,
-      contact: this.state.contact,
+      contact: !!this.state.contact,
       language: this.state.language,
       modality: this.state.modality
     };

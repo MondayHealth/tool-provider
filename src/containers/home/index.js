@@ -49,7 +49,8 @@ class Home extends Component {
       radius: 1,
       gender: 0,
       language: 0,
-      modality: 0
+      modality: 0,
+      contact: false
     };
 
     this.initialCount = 50;
@@ -95,7 +96,7 @@ class Home extends Component {
       delete params.language;
     }
 
-    if (!!params.contact) {
+    if (!params.contact) {
       delete params.contact;
     }
 
