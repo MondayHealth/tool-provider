@@ -147,7 +147,8 @@ class FilterEditor extends Component {
       radius: this.state.radius,
       gender: this.state.gender,
       contact: this.state.contact,
-      language: this.state.language
+      language: this.state.language,
+      modality: this.state.modality
     };
 
     let [min, max] = this.state.feeRange;
