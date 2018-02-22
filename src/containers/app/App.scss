@@ -122,22 +122,20 @@ div.home-content-container
 
     }
 
-
     .provider-result-list
     {
       width: 100%;
 
-      .result-wrapper:nth-child(even)
-      {
-        .result-element
-        {
-          background-color: $light-gray4;
-        }
+      background-color: $gray5;
 
-        .result-element:hover
-        {
-          background-color: $light-gray3;
-        }
+      .result-element:nth-child(even)
+      {
+        background-color: $light-gray1;
+      }
+
+      .result-element:hover
+      {
+        background-color: $gray4;
       }
 
       #first
@@ -161,6 +159,11 @@ div.home-content-container
         .provider-name-display
         {
           margin-bottom: 5px;
+
+          #id
+          {
+            color: $gray3;
+          }
         }
 
         .credentials
@@ -168,8 +171,7 @@ div.home-content-container
           span
           {
             margin-right: 5px;
-            color: $gray3;
-            background-color: $light-gray3;
+            color: $dark-gray3;
           }
         }
 
@@ -179,13 +181,8 @@ div.home-content-container
           white-space: nowrap;
           width: 450px;
           overflow: hidden;
-          color: $gray1;
+          color: $dark-gray3;
         }
-      }
-
-      .result-element:hover
-      {
-        background-color: $light-gray3;
       }
     }
   }
@@ -196,16 +193,22 @@ div.home-content-container
     width: 100%;
     overflow: hidden;
 
+    .provider-detail
+    {
+      background: $light-gray5;
+    }
+
     .results-map-wrapper
     {
       width: inherit;
       height: 500px;
-      box-shadow: 0 -2px 20px 5px $gray4;
+
       .results-map
       {
         width: 100%;
         height: 100%;
       }
+
     }
   }
 }

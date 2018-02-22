@@ -12,16 +12,15 @@
     margin: 0 5px 0 0;
   }
 
-  #gender
+  .gender
   {
-    color: $gray4;
     font-weight: 900;
     margin-top: 10px;
   }
 
   #first
   {
-    color: $gray1;
+    color: $dark-gray5;
   }
 
   #last
@@ -36,14 +35,16 @@
     margin-right: 2px;
   }
 
-  span.icon-on
+  span.icon-on,
+  .gender-on
   {
     color: $pt-intent-success;
   }
 
-  span.icon-off
+  span.icon-off,
+  .gender-off
   {
-    color: $gray4;
+    color: $gray3;
   }
 
   #id
