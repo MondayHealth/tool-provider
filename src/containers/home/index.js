@@ -130,27 +130,25 @@ class Home extends Component {
 
   render() {
     return (
-      <div>
-        <div className="home-content-container">
-          <FilterEditor onFiltersChanged={this.filtersChanged} />
-          <div className="home-results-container">
-            <PaginationEditor
-              total={this.props.provider.serverCount}
-              initialCount={this.initialCount}
-              onOffsetChanged={this.offsetChanged}
-            />
-            <ProviderResultList elements={this.props.provider.byID} />
-          </div>
+      <div className="home-content-container">
+        <FilterEditor onFiltersChanged={this.filtersChanged} />
+        <div className="home-results-container">
+          <PaginationEditor
+            total={this.props.provider.serverCount}
+            initialCount={this.initialCount}
+            onOffsetChanged={this.offsetChanged}
+          />
+          <ProviderResultList elements={this.props.provider.byID} />
+        </div>
 
-          <div className={"side-bar-container"}>
-            <MapResults
-              center={this.state.center}
-              radius={this.state.radius}
-              elements={this.props.provider.byID}
-              mouseOverHandler={this.mapMouseOver}
-            />
-            <ProviderDetail />
-          </div>
+        <div className={"side-bar-container"}>
+          <MapResults
+            center={this.state.center}
+            radius={this.state.radius}
+            elements={this.props.provider.byID}
+            mouseOverHandler={this.mapMouseOver}
+          />
+          <ProviderDetail />
         </div>
       </div>
     );

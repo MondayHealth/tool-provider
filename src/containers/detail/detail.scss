@@ -4,6 +4,11 @@
 {
   padding: 15px;
 
+  .no-content
+  {
+    color: $pt-text-color-disabled;
+  }
+
   .line-item-undefined, .line-list-empty
   {
     color: $light-gray1;

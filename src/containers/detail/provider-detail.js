@@ -154,7 +154,11 @@ class ProviderDetail extends Component {
   }
   render() {
     if (!this.state.detail || !this.state.detail.hasOwnProperty("id")) {
-      return <h4>Loading...</h4>;
+      return (
+        <div className={"provider-detail"}>
+          <h4 className={"no-content"}>Nothing to display.</h4>
+        </div>
+      );
     }
 
     const elt = this.props.detail;

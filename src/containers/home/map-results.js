@@ -23,13 +23,9 @@ class MapResults extends Component {
   }
 
   mapPinClicked(ids) {
-    if (!ids) {
-      return;
+    if (ids) {
+      this.props.setDetailID(ids.values().next().value);
     }
-
-    const firstID = ids.values().next().value;
-
-    this.props.setDetailID(firstID);
   }
 
   updatePins() {
