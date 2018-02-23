@@ -19,6 +19,17 @@ class MapResults extends Component {
     const node = ReactDOM.findDOMNode(this.refs.map);
     this.map = new Map(node, null);
     this.map.setMouseOverFunction(this.props.mouseOverHandler);
+    this.map.setClickHandlerFunction(this.mapPinClicked.bind(this));
+  }
+
+  mapPinClicked(ids) {
+    if (!ids) {
+      return;
+    }
+
+    const firstID = ids.values().next().value;
+
+    this.props.setDetailID(firstID);
   }
 
   updatePins() {

@@ -88,6 +88,7 @@ export default class Map {
     this._currentlyBouncingPins = null;
 
     this._mouseOverHandler = null;
+    this._clickHandler = null;
   }
 
   static getStyles() {
@@ -106,6 +107,10 @@ export default class Map {
 
   setMouseOverFunction(newFunction) {
     this._mouseOverHandler = newFunction;
+  }
+
+  setClickHandlerFunction(newFunction) {
+    this._clickHandler = newFunction;
   }
 
   circle(radius) {
@@ -169,7 +174,8 @@ export default class Map {
     const distance =
       window.google.maps.geometry.spherical.computeDistanceBetween;
 
-    const callback = this._mouseOverHandler;
+    const mouseOverCallback = this._mouseOverHandler;
+    const clickCallback = this._clickHandler;
     const bounds = new window.google.maps.LatLngBounds();
 
     // Reset this
@@ -212,8 +218,14 @@ export default class Map {
 
         newMarker.ids = new Set([id]);
         newMarker.addListener("mouseover", () => {
-          if (callback) {
-            callback(newMarker.ids);
+          if (mouseOverCallback) {
+            mouseOverCallback(newMarker.ids);
+          }
+        });
+
+        newMarker.addListener("click", () => {
+          if (clickCallback) {
+            clickCallback(newMarker.ids);
           }
         });
 
