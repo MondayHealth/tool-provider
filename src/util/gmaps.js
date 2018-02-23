@@ -7,6 +7,9 @@ const CACHE = {};
 
 export const METERS_PER_MILE = 1609.34;
 
+const GREEN_PIN =
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABsAAAArCAYAAACJrvP4AAACBUlEQVR4AbWXvY2sMBSFKYEmKMJl0MEEJJO/hJjkRSQTEEwHzuiDJlzGic7jaLHeLGK5NqyRrizv2OfT/bO9lfWRrFdrQfjVwmogCY3b3Ot3rTtXMiAgRokuDOgx0eHBCm61iho17/Gift/gYzZ08wQzFkRx2xy1fvO8TQKBGLThy4sq2xw6bl4OJigwoEKjjTesoXSkdxq6LJABPAypkmqHLt+ktwHrz/CNSq4tkG/Slf6nV7HqCpj7751iqj5J2rjUrPxq723UPGGf9MVRCL0a09w0r8KvA5ttoA4EcQQLZmEsEj4x/W4XSqiS8uUNmK+T8iaYna/JgE12KEFCsNCgLeqZ9GMYlxZ90Zy1+ENxBJtG+KLVKH1x1GcuEEX7TPrixOMqyNUCJ0gMYfg8iDt1eQmYdKW/v8tCh+FXQdKT7uF9ZuQu28LZEwHE/Mb8K0DpSG/PuH+JWpfmCbALN4slxKJI+dTtA96XgNqn/Tnvxsa6DYxbucl9qPYL894lWq99OZxd7/1NAmmd1t957zsk9h7i+XfnU6+M8DBO9fOeyi+W+gdYnV8UlnevH+48/f2aV4Z3B7AbXhmN/txVpuZGA1/27qE+OuirRwlYvQ+lcdjeD2WLp0DUGENYCuZ7TN/f76U+kkNsAY2al4Q94z+NGjUvCXNfF6ujxngWFs0bSFzJ1z8hAMIp72QFjQAAAABJRU5ErkJggg==";
+
 export function geocode(address) {
   if (address in CACHE) {
     let val = CACHE[address];
@@ -65,6 +68,10 @@ export default class Map {
     this._center = center || { lat: 40.7127753, lng: -74.0059728 };
     this._circle = null;
 
+    this._greenPinImage = {
+      url: GREEN_PIN
+    };
+
     const mapConfig = Object.assign(
       {},
       {
@@ -86,6 +93,7 @@ export default class Map {
     this._pins = {};
     this._invertedPinIndex = {};
     this._currentlyBouncingPins = null;
+    this._currentlyHighlightedPins = null;
 
     this._mouseOverHandler = null;
     this._clickHandler = null;
@@ -145,7 +153,7 @@ export default class Map {
     this._map.fitBounds(viewCircle.getBounds());
   }
 
-  bouncePinForID(id) {
+  bouncePinsForID(id) {
     if (this._currentlyBouncingPins) {
       this._currentlyBouncingPins.forEach(marker => marker.setAnimation(null));
       this._currentlyBouncingPins = null;
@@ -166,6 +174,27 @@ export default class Map {
     this._currentlyBouncingPins = markerSet;
   }
 
+  highlightPinsForID(id) {
+    if (this._currentlyHighlightedPins) {
+      this._currentlyHighlightedPins.forEach(marker => marker.setIcon(null));
+      this._currentlyHighlightedPins = null;
+    }
+
+    if (!id) {
+      return;
+    }
+
+    const markerSet = this._invertedPinIndex[id];
+
+    if (!markerSet) {
+      return;
+    }
+
+    const icon = this._greenPinImage;
+    markerSet.forEach(marker => marker.setIcon(icon));
+    this._currentlyHighlightedPins = markerSet;
+  }
+
   updatePins(newPins) {
     const center = this._circle ? this._circle.getCenter() : null;
     const radius = this._circle ? this._circle.getRadius() : null;
@@ -182,7 +211,8 @@ export default class Map {
     this._invertedPinIndex = {};
 
     // And this
-    this.bouncePinForID(null);
+    this.bouncePinsForID(null);
+    this.highlightPinsForID(null);
 
     const count = newPins.length;
     const replacement = {};

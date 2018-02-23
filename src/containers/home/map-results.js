@@ -65,7 +65,11 @@ class MapResults extends Component {
       }
       const currentID = this.props.mouseOverID.id;
       if (!prevProps || currentID !== prevProps.mouseOverID.id) {
-        this.map.bouncePinForID(currentID);
+        this.map.bouncePinsForID(currentID);
+      }
+      const detailID = this.props.detail.id;
+      if (detailID !== prevProps.detail.id) {
+        this.map.highlightPinsForID(detailID);
       }
     }
 
@@ -97,7 +101,8 @@ MapResults.propTypes = {
 const mapStateToProps = state => {
   return {
     maps: state.maps,
-    mouseOverID: state.mouseOverProviderID
+    mouseOverID: state.mouseOverProviderID,
+    detail: state.detail
   };
 };
 
