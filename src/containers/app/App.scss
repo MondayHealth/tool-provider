@@ -103,39 +103,6 @@ div.home-content-container
     min-width: 470px;
     background-color: $light-gray3;
 
-    .pagination-editor
-    {
-      display: flex;
-      width: 100%;
-
-      background-color: $light-gray2;
-      padding: 10px;
-      color: $gray3;
-
-      span
-      {
-        display: flex;
-        justify-content: center;
-        flex-direction: column;
-
-      }
-      .pt-form-group
-      {
-        margin: 0;
-        padding-right: 5px;
-      }
-      .pt-numeric-input
-      {
-        max-width: 88px;
-      }
-      .pt-select
-      {
-        padding-left: 5px;
-        padding-right: 5px;
-      }
-
-    }
-
     .provider-result-list
     {
       width: 100%;

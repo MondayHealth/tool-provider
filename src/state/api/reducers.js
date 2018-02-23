@@ -55,7 +55,11 @@ export function providers(state = initialProviderState, action) {
     case RECEIVE_PROVIDER_RECORD_COUNT:
       return { ...state, serverCount: action.result };
     case RECEIVE_PROVIDER_RECORD_LIST:
-      return { ...state, byID: generateProviderIDDictionary(action.result) };
+      return {
+        ...state,
+        total: action.result.total,
+        byID: generateProviderIDDictionary(action.result.records)
+      };
     default:
       return state;
   }

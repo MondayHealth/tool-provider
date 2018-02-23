@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { providerCount, providerList } from "../../state/api/actions";
+import { providerList } from "../../state/api/actions";
 
 import ProviderResultList from "./provider-result-list";
 import PaginationEditor from "./pagination-editor";
@@ -50,10 +50,9 @@ class Home extends Component {
       gender: 0,
       language: 0,
       modality: 0,
-      contact: false
+      contact: false,
+      freeConsult: false
     };
-
-    this.initialCount = 50;
 
     this.offsetChanged = this.offsetChanged.bind(this);
     this.filtersChanged = this.filtersChanged.bind(this);
@@ -63,7 +62,6 @@ class Home extends Component {
   }
 
   componentWillMount() {
-    this.props.loadProviderCount();
     this.reload();
   }
 
@@ -100,6 +98,10 @@ class Home extends Component {
       delete params.contact;
     }
 
+    if (!params.freeConsult) {
+      delete params.freeConsult;
+    }
+
     // Don't do anything if the params haven't changed
     if (shallowEquals(params, this.currentParams)) {
       return;
@@ -133,11 +135,7 @@ class Home extends Component {
       <div className="home-content-container">
         <FilterEditor onFiltersChanged={this.filtersChanged} />
         <div className="home-results-container">
-          <PaginationEditor
-            total={this.props.provider.serverCount}
-            initialCount={this.initialCount}
-            onOffsetChanged={this.offsetChanged}
-          />
+          <PaginationEditor onOffsetChanged={this.offsetChanged} />
           <ProviderResultList elements={this.props.provider.byID} />
         </div>
 
@@ -163,7 +161,6 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    loadProviderCount: providerCount(dispatch),
     requery: providerList(dispatch)
   };
 };

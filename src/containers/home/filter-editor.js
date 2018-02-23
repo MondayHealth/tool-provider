@@ -20,7 +20,9 @@ class FilterEditor extends Component {
       coordinate: null,
       addressInputValidity: null,
       radius: 1,
-      contact: false
+      contact: false,
+      freeConsult: false,
+      freeInputValue: ""
     };
 
     this.lastAddressSearched = "";
@@ -56,6 +58,7 @@ class FilterEditor extends Component {
     this.radiusSliderReleased = this.radiusSliderReleased.bind(this);
     this.genderSelectChanged = this.genderSelectChanged.bind(this);
     this.contactInfoChanged = this.contactInfoChanged.bind(this);
+    this.freeConsultChanged = this.freeConsultChanged.bind(this);
     this.languageSelectChanged = this.languageSelectChanged.bind(this);
     this.feeRangeSliderChange = this.feeRangeSliderChange.bind(this);
     this.feeRangeSliderReleased = this.feeRangeSliderReleased.bind(this);
@@ -148,7 +151,8 @@ class FilterEditor extends Component {
       gender: this.state.gender,
       contact: !!this.state.contact,
       language: this.state.language,
-      modality: this.state.modality
+      modality: this.state.modality,
+      freeConsult: this.state.freeConsult
     };
 
     let [min, max] = this.state.feeRange;
@@ -266,6 +270,12 @@ class FilterEditor extends Component {
     );
   }
 
+  freeConsultChanged(evt) {
+    this.setState({ freeConsult: evt.target.checked }, () =>
+      this.filterStateHasChanged()
+    );
+  }
+
   addressInputChanged(evt) {
     this.setState({ addressInputValue: evt.target.value });
   }
@@ -345,6 +355,18 @@ class FilterEditor extends Component {
           </div>
         </label>
 
+        <label className={"pt-label"}>
+          Group / Orientation
+          <div className={"pt-input-group"}>
+            <span className="pt-icon pt-icon-search" />
+            <input
+              type="text"
+              className="pt-input"
+              placeholder="Enter Keywords"
+            />
+          </div>
+        </label>
+
         <label className="pt-label">
           Payor
           <div className="pt-select">
@@ -413,6 +435,16 @@ class FilterEditor extends Component {
           />
           <span className="pt-control-indicator" />
           Has Contact Info
+        </label>
+
+        <label className="pt-control pt-checkbox pt-large">
+          <input
+            type="checkbox"
+            defaultValue={this.state.freeConsult}
+            onChange={this.freeConsultChanged}
+          />
+          <span className="pt-control-indicator" />
+          Free Consult
         </label>
       </div>
     );
