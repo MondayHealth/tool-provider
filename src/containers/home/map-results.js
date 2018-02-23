@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { Spinner } from "@blueprintjs/core";
 import PropTypes from "prop-types";
 import Map from "../../util/gmaps";
+import { loadDetailByID, mouseOverProviderByID } from "../../state/api/actions";
 
 class MapResults extends Component {
   constructor(props) {
@@ -50,10 +51,15 @@ class MapResults extends Component {
       this.setState({ loading: false }, () => this.loadMap());
     }
 
-    if (this.map && this.props.center) {
-      this.map.center(this.props.center);
-      this.map.circle(this.props.radius);
-      this.map.fitToCircle();
+    if (this.map) {
+      if (this.props.center) {
+        this.map.center(this.props.center);
+        this.map.circle(this.props.radius);
+      }
+      const currentID = this.props.mouseOverID.id;
+      if (!prevProps || currentID !== prevProps.mouseOverID.id) {
+        this.map.bouncePinForID(currentID);
+      }
     }
 
     if (!prevProps || this.props.elements !== prevProps.elements) {
@@ -83,8 +89,16 @@ MapResults.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    maps: state.maps
+    maps: state.maps,
+    mouseOverID: state.mouseOverProviderID
   };
 };
 
-export default connect(mapStateToProps)(MapResults);
+const mapDispatchToProps = dispatch => {
+  return {
+    setDetailID: loadDetailByID(dispatch),
+    mouseOverProvider: mouseOverProviderByID(dispatch)
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(MapResults);

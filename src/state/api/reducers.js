@@ -1,5 +1,6 @@
 import {
   GOOGLE_MAPS_LOADED,
+  MOUSE_OVER_PROVIDER,
   RECEIVE_HELLO,
   RECEIVE_PROVIDER_RECORD_COUNT,
   RECEIVE_PROVIDER_RECORD_LIST
@@ -112,4 +113,18 @@ export function detail(state = {}, action) {
   }
 
   return action.result;
+}
+
+// noinspection JSUnusedGlobalSymbols
+export function mouseOverProviderID(state = { id: null }, action) {
+  if (!action || !action.type) {
+    return state;
+  }
+
+  switch (action.type) {
+    case MOUSE_OVER_PROVIDER:
+      return { ...state, id: action.id };
+    default:
+      return state;
+  }
 }

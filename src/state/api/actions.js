@@ -15,6 +15,13 @@ function googleMapsLoadedAction() {
   return { type: GOOGLE_MAPS_LOADED };
 }
 
+export const MOUSE_OVER_PROVIDER = "MOUSE_OVER_PROVIDER";
+export function mouseOverProviderByID(dispatch) {
+  return function(id) {
+    dispatch({ type: MOUSE_OVER_PROVIDER, id: id });
+  };
+}
+
 export const RECEIVE_HELLO = "rx:hello";
 export const RECEIVE_PROVIDER_RECORD_COUNT = "rx:providers/count";
 export const RECEIVE_PROVIDER_RECORD_LIST = "rx:providers/list";

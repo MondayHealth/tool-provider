@@ -84,6 +84,8 @@ export default class Map {
     transitLayer.setMap(this._map);
 
     this._pins = {};
+    this._invertedPinIndex = {};
+    this._currentlyBouncingPins = null;
 
     this._mouseOverHandler = null;
   }
@@ -122,6 +124,8 @@ export default class Map {
       this._circle.setRadius(radius * METERS_PER_MILE);
       this._circle.setCenter(this._center);
     }
+
+    this.fitToCircle();
   }
 
   fitToCircle() {
@@ -136,15 +140,45 @@ export default class Map {
     this._map.fitBounds(viewCircle.getBounds());
   }
 
+  bouncePinForID(id) {
+    if (this._currentlyBouncingPins) {
+      this._currentlyBouncingPins.forEach(marker => marker.setAnimation(null));
+      this._currentlyBouncingPins = null;
+    }
+
+    if (!id) {
+      return;
+    }
+
+    const markerSet = this._invertedPinIndex[id];
+
+    if (!markerSet) {
+      return;
+    }
+
+    const animation = window.google.maps.Animation.BOUNCE;
+    markerSet.forEach(marker => marker.setAnimation(animation));
+    this._currentlyBouncingPins = markerSet;
+  }
+
   updatePins(newPins) {
     const center = this._circle ? this._circle.getCenter() : null;
     const radius = this._circle ? this._circle.getRadius() : null;
+
+    // The path to this is annoying
     const distance =
       window.google.maps.geometry.spherical.computeDistanceBetween;
 
     const callback = this._mouseOverHandler;
+    const bounds = new window.google.maps.LatLngBounds();
 
-    let count = newPins.length;
+    // Reset this
+    this._invertedPinIndex = {};
+
+    // And this
+    this.bouncePinForID(null);
+
+    const count = newPins.length;
     const replacement = {};
     for (let i = 0; i < count; i++) {
       let pin = newPins[i];
@@ -153,17 +187,24 @@ export default class Map {
       let loc = new window.google.maps.LatLng(pin.lat, pin.lng);
 
       if (this._circle) {
+        // Don't display pins outside this circle
         if (distance(center, loc) > radius) {
           continue;
         }
+      } else {
+        // If no circle, continue to calculate map bounds
+        bounds.extend(loc);
       }
 
+      // If we already have a pin at this hash just save the id to it
       if (replacement[hash]) {
         replacement[hash].ids.add(id);
       } else if (this._pins[hash]) {
+        // If this pin already exists but isnt found yet, save it
         replacement[hash] = this._pins[hash];
         replacement[hash].ids = new Set([id]);
       } else {
+        // We've never seen this hash before, make a new marker for it
         const newMarker = new window.google.maps.Marker({
           position: loc,
           map: this._map
@@ -178,16 +219,31 @@ export default class Map {
 
         replacement[hash] = newMarker;
       }
+
+      if (id in this._invertedPinIndex) {
+        this._invertedPinIndex[id].add(replacement[hash]);
+      } else {
+        this._invertedPinIndex[id] = new Set([replacement[hash]]);
+      }
     }
 
+    // Remove all the pin objects that are no longer used
     const oldHashes = Object.keys(this._pins);
-    count = oldHashes.length;
-    for (let i = 0; i < count; i++) {
+    const oldCount = oldHashes.length;
+    for (let i = 0; i < oldCount; i++) {
       let current = oldHashes[i];
       if (!replacement[current]) {
         this._pins[current].setMap(null);
       }
     }
+
+    // Save the new pins
     this._pins = replacement;
+
+    if (this._circle) {
+      this.fitToCircle();
+    } else if (count > 0) {
+      this._map.fitBounds(bounds);
+    }
   }
 }

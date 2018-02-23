@@ -1,17 +1,27 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import ProviderName from "../detail/provider-name";
-import { loadDetailByID } from "../../state/api/actions";
+import { loadDetailByID, mouseOverProviderByID } from "../../state/api/actions";
 
 class ProviderListElement extends Component {
   constructor(props) {
     super(props);
     this.id = this.props.elt.id;
     this.clickHandler = this.clickHandler.bind(this);
+    this.mouseEnterHandler = this.mouseEnterHandler.bind(this);
+    this.mouseLeaveHandler = this.mouseLeaveHandler.bind(this);
   }
 
   clickHandler() {
     this.props.setDetailID(this.id);
+  }
+
+  mouseEnterHandler() {
+    this.props.mouseOverProvider(this.id);
+  }
+
+  mouseLeaveHandler() {
+    this.props.mouseOverProvider(null);
   }
 
   render() {
@@ -41,6 +51,8 @@ class ProviderListElement extends Component {
         key={this.props.key}
         className={className}
         onClick={this.clickHandler}
+        onMouseEnter={this.mouseEnterHandler}
+        onMouseLeave={this.mouseLeaveHandler}
       >
         <ProviderName elt={elt} />
         <div className={"credentials"}>
@@ -57,7 +69,8 @@ class ProviderListElement extends Component {
 
 const mapDispatchToProps = dispatch => {
   return {
-    setDetailID: loadDetailByID(dispatch)
+    setDetailID: loadDetailByID(dispatch),
+    mouseOverProvider: mouseOverProviderByID(dispatch)
   };
 };
 
