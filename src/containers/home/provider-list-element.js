@@ -43,8 +43,11 @@ class ProviderListElement extends Component {
       <span key={idx}>{fixtures.degrees[value]}</span>
     ));
 
-    const className =
-      "result-element" + (this.props.selected ? " res-selected" : "");
+    let className = "result-element";
+
+    if (this.props.detail.id === this.id) {
+      className += " result-selected";
+    }
 
     return (
       <div
@@ -54,6 +57,7 @@ class ProviderListElement extends Component {
         onMouseEnter={this.mouseEnterHandler}
         onMouseLeave={this.mouseLeaveHandler}
       >
+        <div className={"select-indicator"} />
         <ProviderName elt={elt} />
         <div className={"credentials"}>
           {degrees}
@@ -67,11 +71,17 @@ class ProviderListElement extends Component {
   }
 }
 
-const mapDispatchToProps = dispatch => {
+const dispatchToProps = dispatch => {
   return {
     setDetailID: loadDetailByID(dispatch),
     mouseOverProvider: mouseOverProviderByID(dispatch)
   };
 };
 
-export default connect(null, mapDispatchToProps)(ProviderListElement);
+const stateToProps = state => {
+  return {
+    detail: state.detail
+  };
+};
+
+export default connect(stateToProps, dispatchToProps)(ProviderListElement);

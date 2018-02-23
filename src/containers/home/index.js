@@ -139,10 +139,7 @@ class Home extends Component {
               initialCount={this.initialCount}
               onOffsetChanged={this.offsetChanged}
             />
-            <ProviderResultList
-              elements={this.props.provider.byID}
-              selected={this.state.selectedID}
-            />
+            <ProviderResultList elements={this.props.provider.byID} />
           </div>
 
           <div className={"side-bar-container"}>

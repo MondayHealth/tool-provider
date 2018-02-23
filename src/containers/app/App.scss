@@ -125,18 +125,7 @@ div.home-content-container
     .provider-result-list
     {
       width: 100%;
-
       background-color: $gray5;
-
-      .result-element:nth-child(even)
-      {
-        background-color: $light-gray1;
-      }
-
-      .result-element:hover
-      {
-        background-color: $gray4;
-      }
 
       #first
       {
@@ -151,10 +140,51 @@ div.home-content-container
         text-decoration: none;
       }
 
+      .result-element:nth-child(even)
+      {
+        background-color: $light-gray1;
+
+        .select-indicator
+        {
+          background-color: darken($light-gray1, 10%);
+        }
+      }
+
+      .result-element:hover
+      {
+        background-color: $gray4;
+
+        .select-indicator
+        {
+          background-color: $gray2;
+        }
+      }
+
+      .result-element.result-selected
+      {
+        background-color: lighten(desaturate($green4, 50%), 37%);
+
+        .select-indicator
+        {
+          background: $green4;
+        }
+      }
+
       .result-element
       {
+        position: relative;
         padding: 5px 10px;
         height: 90px;
+
+        .select-indicator
+        {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 5px;
+          height: 100%;
+          background-color: darken($gray5, 10%);
+        }
 
         .provider-name-display
         {
