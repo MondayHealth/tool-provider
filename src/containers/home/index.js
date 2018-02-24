@@ -51,7 +51,8 @@ class Home extends Component {
       language: 0,
       modality: 0,
       contact: false,
-      freeConsult: false
+      freeConsult: false,
+      keywords: null
     };
 
     this.offsetChanged = this.offsetChanged.bind(this);
@@ -100,6 +101,10 @@ class Home extends Component {
 
     if (!params.freeConsult) {
       delete params.freeConsult;
+    }
+
+    if (!params.keywords) {
+      delete params.keywords;
     }
 
     // Don't do anything if the params haven't changed

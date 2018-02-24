@@ -22,7 +22,8 @@ class FilterEditor extends Component {
       radius: 1,
       contact: false,
       freeConsult: false,
-      freeInputValue: ""
+      freeInputValue: "",
+      keywords: ""
     };
 
     this.lastAddressSearched = "";
@@ -63,6 +64,8 @@ class FilterEditor extends Component {
     this.feeRangeSliderChange = this.feeRangeSliderChange.bind(this);
     this.feeRangeSliderReleased = this.feeRangeSliderReleased.bind(this);
     this.modalitySelectChanged = this.modalitySelectChanged.bind(this);
+    this.keywordInputChanged = this.keywordInputChanged.bind(this);
+    this.keywordInputKeyUp = this.keywordInputKeyUp.bind(this);
   }
 
   regeneratePayorOptions(props) {
@@ -152,7 +155,8 @@ class FilterEditor extends Component {
       contact: !!this.state.contact,
       language: this.state.language,
       modality: this.state.modality,
-      freeConsult: this.state.freeConsult
+      freeConsult: this.state.freeConsult,
+      keywords: this.state.keywords
     };
 
     let [min, max] = this.state.feeRange;
@@ -286,6 +290,28 @@ class FilterEditor extends Component {
     }
   }
 
+  keywordInputChanged(evt) {
+    this.setState({ keywords: evt.target.value });
+  }
+
+  static keywordReducer(acc, elt) {
+    const e = elt.trim();
+    return e ? `${acc} ${e}` : acc;
+  }
+
+  keywordInputKeyUp(evt) {
+    if (evt.keyCode !== 13) {
+      return;
+    }
+
+    let val = evt.target.value
+      .replace(/[|&;$%@,./'"<>()+]/g, "")
+      .split(" ")
+      .reduce(FilterEditor.keywordReducer);
+
+    this.setState({ keywords: val }, () => this.filterStateHasChanged());
+  }
+
   render() {
     let addressButton;
 
@@ -363,6 +389,9 @@ class FilterEditor extends Component {
               type="text"
               className="pt-input"
               placeholder="Enter Keywords"
+              onKeyUp={this.keywordInputKeyUp}
+              onChange={this.keywordInputChanged}
+              value={this.state.keywords}
             />
           </div>
         </label>
