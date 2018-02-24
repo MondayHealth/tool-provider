@@ -296,7 +296,7 @@ class FilterEditor extends Component {
 
   static keywordReducer(acc, elt) {
     const e = elt.trim();
-    return e ? `${acc} ${e}` : acc;
+    return e ? acc + " " + e : acc;
   }
 
   keywordInputKeyUp(evt) {
@@ -305,7 +305,7 @@ class FilterEditor extends Component {
     }
 
     let val = evt.target.value
-      .replace(/[|&;$%@,./'"<>()+]/g, "")
+      .replace(/[|&;$%@:*,./'"<>()+]/g, "")
       .split(" ")
       .reduce(FilterEditor.keywordReducer);
 
