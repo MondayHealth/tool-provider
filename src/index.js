@@ -1,7 +1,7 @@
 import React from "react";
 import { render } from "react-dom";
 import "normalize.css";
-import "@blueprintjs/core/dist/blueprint.css";
+import "@blueprintjs/core/lib/css/blueprint.css";
 import "./index.css";
 import App from "./containers/app";
 import store, { history } from "./store-index";

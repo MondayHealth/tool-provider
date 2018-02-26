@@ -1,8 +1,16 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { TopToaster } from "../../toaster";
-import { Intent, RangeSlider, Slider, Spinner } from "@blueprintjs/core";
+import {
+  Intent,
+  MenuItem,
+  RangeSlider,
+  Slider,
+  Spinner
+} from "@blueprintjs/core";
 import { geocode } from "../../util/gmaps";
+
+import { MultiSelect } from "@blueprintjs/select";
 
 class FilterEditor extends Component {
   constructor(props) {
@@ -118,16 +126,7 @@ class FilterEditor extends Component {
   }
   regenerateSpecialtyOptions(props) {
     this.specialtyOptions = Object.entries(props.fixtures.specialties).map(
-      ([index, value]) => (
-        <option key={index} value={index}>
-          {value}
-        </option>
-      )
-    );
-    this.specialtyOptions.unshift(
-      <option key={"0"} value="0">
-        None
-      </option>
+      a => a
     );
   }
 
@@ -329,6 +328,7 @@ class FilterEditor extends Component {
     return (
       <div className={"filter-editor"}>
         <h3>Search Filters</h3>
+
         <div
           className={
             "pt-input-group address-search " +
@@ -410,14 +410,18 @@ class FilterEditor extends Component {
 
         <label className="pt-label">
           Specialty
-          <div className="pt-select">
-            <select
-              defaultValue={this.state.specialty}
-              onChange={this.specialtySelectChanged}
-            >
-              {this.specialtyOptions}
-            </select>
-          </div>
+          <MultiSelect
+            itemRenderer={([idx, value], { handleClick, index, modifiers }) => {
+              return <MenuItem key={idx} text={value} onClick={handleClick} />;
+            }}
+            items={this.specialtyOptions}
+            noResults={<MenuItem key={0} disabled={true} text="No results." />}
+            onItemSelect={val => console.log(val)}
+            tagRenderer={a => {
+              debugger;
+              return a;
+            }}
+          />
         </label>
 
         <label className="pt-label">
