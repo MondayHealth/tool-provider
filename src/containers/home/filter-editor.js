@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { TopToaster } from "../../toaster";
 import {
+  Button,
   Intent,
   MenuItem,
   RangeSlider,
@@ -10,18 +11,102 @@ import {
 } from "@blueprintjs/core";
 import { geocode } from "../../util/gmaps";
 
-import { MultiSelect } from "@blueprintjs/select";
+import { MultiSelect, Select } from "@blueprintjs/select";
+
+class FixtureSelectPre extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectionName: null
+    };
+
+    this.cb = this.cb.bind(this);
+
+    this.elementList = [];
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const pName = this.props.propertyName;
+    const currentFixture = this.props.fixtures[pName];
+    const nextFixture = nextProps.fixtures ? nextProps.fixtures[pName] : null;
+
+    if (currentFixture === nextFixture) {
+      return;
+    }
+
+    if (!nextFixture) {
+      this.elementList = [];
+      return;
+    }
+
+    if (Array.isArray(nextFixture)) {
+      this.elementList = nextFixture.map((t, i) => [i, t]);
+    } else {
+      this.elementList = Object.entries(nextFixture);
+    }
+  }
+
+  cb([key, value]) {
+    this.setState({ selectionName: value });
+    this.props.callback(key);
+  }
+
+  static valuePredicate(pred, [index, value]) {
+    return !pred ? true : value.indexOf(pred.trim()) > -1;
+  }
+
+  static renderItem([idx, value], { handleClick, modifiers }) {
+    if (modifiers.filtered) {
+      return null;
+    }
+
+    if (!modifiers.matchesPredicate) {
+      return null;
+    }
+
+    return (
+      <MenuItem key={idx} label={idx} text={value} onClick={handleClick} />
+    );
+  }
+
+  render() {
+    const btnText = this.state.selectionName || this.props.displayName;
+
+    return (
+      <label className="pt-label">
+        {this.props.displayName}
+        <div className="pt-select">
+          <Select
+            items={this.elementList}
+            onItemSelect={this.cb}
+            noResults={<MenuItem key={0} disabled={true} text="No results." />}
+            itemPredicate={FixtureSelectPre.valuePredicate}
+            itemRenderer={FixtureSelectPre.renderItem}
+          >
+            <Button text={btnText} rightIcon="caret-down" />
+          </Select>
+        </div>
+      </label>
+    );
+  }
+}
+
+const FixtureSelect = connect(state => {
+  return {
+    fixtures: state.fixtures
+  };
+})(FixtureSelectPre);
 
 class FilterEditor extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      payor: "0",
-      specialty: "0",
-      gender: "0",
-      language: "0",
-      modality: "0",
+      payor: 0,
+      specialty: 0,
+      gender: 0,
+      language: 0,
+      modality: 0,
       feeRange: [0, 500],
       processingAddress: false,
       addressInputValue: "",
@@ -36,14 +121,8 @@ class FilterEditor extends Component {
 
     this.lastAddressSearched = "";
 
-    this.payorOptions = [];
     this.specialtyOptions = [];
-    this.languageOptions = [];
-    this.modalityOptions = [];
-    this.regenerateLanguageOptions(this.props);
-    this.regeneratePayorOptions(this.props);
     this.regenerateSpecialtyOptions(this.props);
-    this.regenerateModalityOptions(this.props);
 
     this.genderOptions = [
       <option key={"0"} value={"0"}>
@@ -57,7 +136,7 @@ class FilterEditor extends Component {
       </option>
     ];
 
-    this.insuranceSelectChanged = this.insuranceSelectChanged.bind(this);
+    this.payorSelectChanged = this.payorSelectChanged.bind(this);
     this.specialtySelectChanged = this.specialtySelectChanged.bind(this);
     this.addressChanged = this.addressChanged.bind(this);
     this.addressInputKeyUp = this.addressInputKeyUp.bind(this);
@@ -76,54 +155,6 @@ class FilterEditor extends Component {
     this.keywordInputKeyUp = this.keywordInputKeyUp.bind(this);
   }
 
-  regeneratePayorOptions(props) {
-    this.payorOptions = props.fixtures.payors.map((value, index) => (
-      <option key={index} value={index}>
-        {value}
-      </option>
-    ));
-
-    this.payorOptions.unshift(
-      <option key={"0"} value="0">
-        None
-      </option>
-    );
-  }
-
-  regenerateLanguageOptions(props) {
-    if (props.fixtures.languages) {
-      this.languageOptions = Object.entries(props.fixtures.languages).map(
-        ([index, value]) => (
-          <option key={index} value={index}>
-            {value}
-          </option>
-        )
-      );
-    }
-
-    this.languageOptions.unshift(
-      <option key={"0"} value="0">
-        None
-      </option>
-    );
-  }
-
-  regenerateModalityOptions(props) {
-    if (props.fixtures.modalities) {
-      this.modalityOptions = Object.entries(props.fixtures.modalities).map(
-        ([index, value]) => (
-          <option key={index} value={index}>
-            {value}
-          </option>
-        )
-      );
-    }
-    this.modalityOptions.unshift(
-      <option key={"0"} value="0">
-        None
-      </option>
-    );
-  }
   regenerateSpecialtyOptions(props) {
     this.specialtyOptions = Object.entries(props.fixtures.specialties).map(
       a => a
@@ -131,17 +162,8 @@ class FilterEditor extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.fixtures.payors !== nextProps.fixtures.payors) {
-      this.regeneratePayorOptions(nextProps);
-    }
     if (this.props.fixtures.specialties !== nextProps.fixtures.specialties) {
       this.regenerateSpecialtyOptions(nextProps);
-    }
-    if (this.props.fixtures.languages !== nextProps.fixtures.languages) {
-      this.regenerateLanguageOptions(nextProps);
-    }
-    if (this.props.fixtures.modalities !== nextProps.fixtures.modalities) {
-      this.regenerateModalityOptions(nextProps);
     }
   }
 
@@ -171,10 +193,8 @@ class FilterEditor extends Component {
     this.props.onFiltersChanged(newFilterState);
   }
 
-  insuranceSelectChanged(elt) {
-    this.setState({ payor: elt.target.value }, () =>
-      this.filterStateHasChanged()
-    );
+  payorSelectChanged(idx) {
+    this.setState({ payor: idx }, () => this.filterStateHasChanged());
   }
 
   specialtySelectChanged(elt) {
@@ -183,10 +203,8 @@ class FilterEditor extends Component {
     );
   }
 
-  modalitySelectChanged(elt) {
-    this.setState({ modality: elt.target.value }, () =>
-      this.filterStateHasChanged()
-    );
+  modalitySelectChanged(value) {
+    this.setState({ modality: value }, () => this.filterStateHasChanged());
   }
   radiusSliderChange(value) {
     this.setState({ radius: value });
@@ -261,10 +279,8 @@ class FilterEditor extends Component {
     );
   }
 
-  languageSelectChanged(evt) {
-    this.setState({ language: evt.target.value }, () =>
-      this.filterStateHasChanged()
-    );
+  languageSelectChanged(idx) {
+    this.setState({ language: idx }, () => this.filterStateHasChanged());
   }
 
   contactInfoChanged(evt) {
@@ -396,26 +412,28 @@ class FilterEditor extends Component {
           </div>
         </label>
 
-        <label className="pt-label">
-          Payor
-          <div className="pt-select">
-            <select
-              defaultValue={this.state.payor}
-              onChange={this.insuranceSelectChanged}
-            >
-              {this.payorOptions}
-            </select>
-          </div>
-        </label>
+        <FixtureSelect
+          displayName={"Payor"}
+          propertyName={"payors"}
+          callback={this.payorSelectChanged}
+        />
 
         <label className="pt-label">
           Specialty
           <MultiSelect
             itemRenderer={([idx, value], { handleClick, index, modifiers }) => {
-              return <MenuItem key={idx} text={value} onClick={handleClick} />;
+              return (
+                <MenuItem
+                  key={idx}
+                  label={idx}
+                  text={value}
+                  onClick={handleClick}
+                />
+              );
             }}
             items={this.specialtyOptions}
             noResults={<MenuItem key={0} disabled={true} text="No results." />}
+            initialConent={<MenuItem disabled={true} text={`Languages`} />}
             onItemSelect={val => console.log(val)}
             tagRenderer={a => {
               debugger;
@@ -424,17 +442,11 @@ class FilterEditor extends Component {
           />
         </label>
 
-        <label className="pt-label">
-          Modality
-          <div className="pt-select">
-            <select
-              defaultValue={this.state.modality}
-              onChange={this.modalitySelectChanged}
-            >
-              {this.modalityOptions}
-            </select>
-          </div>
-        </label>
+        <FixtureSelect
+          displayName={"Modality"}
+          propertyName={"modalities"}
+          callback={this.modalitySelectChanged}
+        />
 
         <label className="pt-label">
           Gender
@@ -448,17 +460,11 @@ class FilterEditor extends Component {
           </div>
         </label>
 
-        <label className="pt-label">
-          Language
-          <div className="pt-select">
-            <select
-              defaultValue={this.state.language}
-              onChange={this.languageSelectChanged}
-            >
-              {this.languageOptions}
-            </select>
-          </div>
-        </label>
+        <FixtureSelect
+          displayName={"Language"}
+          propertyName={"languages"}
+          callback={this.languageSelectChanged}
+        />
 
         <label className="pt-control pt-checkbox pt-large">
           <input

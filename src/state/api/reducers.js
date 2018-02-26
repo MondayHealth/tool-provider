@@ -66,18 +66,16 @@ export function providers(state = initialProviderState, action) {
 }
 
 const initialFixturesState = {
-  payors: [],
+  payors: {},
   credentials: {},
-  specialties: {}
+  specialties: {},
+  languages: {},
+  plans: {},
+  paymenttypes: {},
+  degrees: {},
+  modalities: {},
+  directories: {}
 };
-
-function generatePayorArray(data) {
-  const ret = [];
-  Object.entries(data).forEach(
-    ([key, value]) => (ret[parseInt(key, 10)] = value)
-  );
-  return ret;
-}
 
 function generateIntKeyDictionary(data) {
   const ret = {};
@@ -101,7 +99,7 @@ export function fixtures(state = initialFixturesState, action) {
 
   switch (fixture) {
     case "payors":
-      return { ...state, payors: generatePayorArray(action.result) };
+      return { ...state, payors: action.result };
     default:
       return {
         ...state,
