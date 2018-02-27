@@ -7,7 +7,8 @@ import {
   MenuItem,
   RangeSlider,
   Slider,
-  Spinner
+  Spinner,
+  Alignment
 } from "@blueprintjs/core";
 import { geocode } from "../../util/gmaps";
 
@@ -73,20 +74,22 @@ class FixtureSelectPre extends Component {
     const btnText = this.state.selectionName || this.props.displayName;
 
     return (
-      <label className="pt-label">
+      <label className="pt-label fixture-select">
         {this.props.displayName}
-        <div className="pt-select">
-          <Select
-            items={this.elementList}
-            onItemSelect={this.cb}
-            noResults={<MenuItem key={0} disabled={true} text="No results." />}
-            itemPredicate={FixtureSelectPre.valuePredicate}
-            itemRenderer={FixtureSelectPre.renderItem}
-            popoverProps={{ minimal: false }}
-          >
-            <Button text={btnText} rightIcon="caret-down" />
-          </Select>
-        </div>
+        <Select
+          items={this.elementList}
+          onItemSelect={this.cb}
+          noResults={<MenuItem key={0} disabled={true} text="No results." />}
+          itemPredicate={FixtureSelectPre.valuePredicate}
+          itemRenderer={FixtureSelectPre.renderItem}
+          popoverProps={{ minimal: false }}
+        >
+          <Button
+            text={btnText}
+            rightIcon="caret-down"
+            alignText={Alignment.LEFT}
+          />
+        </Select>
       </label>
     );
   }

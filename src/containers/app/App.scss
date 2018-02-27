@@ -70,6 +70,14 @@ div.home-content-container
     background-color: $dark-gray5;
     color: $gray4;
 
+    .fixture-select
+    {
+      button
+      {
+        width: 100%;
+      }
+    }
+
     h3
     {
       color: $gray1;
