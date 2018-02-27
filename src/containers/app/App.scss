@@ -78,6 +78,15 @@ div.home-content-container
       }
     }
 
+    .fixture-multi-select
+    {
+      .pt-multi-select
+      {
+        display: flex;
+      }
+    }
+
+
     h3
     {
       color: $gray1;

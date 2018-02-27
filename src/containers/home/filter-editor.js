@@ -1,105 +1,9 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { TopToaster } from "../../toaster";
-import {
-  Button,
-  Intent,
-  MenuItem,
-  RangeSlider,
-  Slider,
-  Spinner,
-  Alignment
-} from "@blueprintjs/core";
+import { Intent, RangeSlider, Slider, Spinner } from "@blueprintjs/core";
 import { geocode } from "../../util/gmaps";
-
-import { MultiSelect, Select } from "@blueprintjs/select";
-
-class FixtureSelectPre extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectionName: null
-    };
-
-    this.cb = this.cb.bind(this);
-
-    this.elementList = [];
-  }
-
-  componentWillReceiveProps(nextProps) {
-    const pName = this.props.propertyName;
-    const currentFixture = this.props.fixtures[pName];
-    const nextFixture = nextProps.fixtures ? nextProps.fixtures[pName] : null;
-
-    if (currentFixture === nextFixture) {
-      return;
-    }
-
-    if (!nextFixture) {
-      this.elementList = [];
-      return;
-    }
-
-    if (Array.isArray(nextFixture)) {
-      this.elementList = nextFixture.map((t, i) => [i, t]);
-    } else {
-      this.elementList = Object.entries(nextFixture);
-    }
-  }
-
-  cb([key, value]) {
-    this.setState({ selectionName: value });
-    this.props.callback(key);
-  }
-
-  static valuePredicate(pred, [index, value]) {
-    return !pred ? true : value.indexOf(pred.trim()) > -1;
-  }
-
-  static renderItem([idx, value], { handleClick, modifiers }) {
-    if (modifiers.filtered) {
-      return null;
-    }
-
-    if (!modifiers.matchesPredicate) {
-      return null;
-    }
-
-    return (
-      <MenuItem key={idx} label={idx} text={value} onClick={handleClick} />
-    );
-  }
-
-  render() {
-    const btnText = this.state.selectionName || this.props.displayName;
-
-    return (
-      <label className="pt-label fixture-select">
-        {this.props.displayName}
-        <Select
-          items={this.elementList}
-          onItemSelect={this.cb}
-          noResults={<MenuItem key={0} disabled={true} text="No results." />}
-          itemPredicate={FixtureSelectPre.valuePredicate}
-          itemRenderer={FixtureSelectPre.renderItem}
-          popoverProps={{ minimal: false }}
-        >
-          <Button
-            text={btnText}
-            rightIcon="caret-down"
-            alignText={Alignment.LEFT}
-          />
-        </Select>
-      </label>
-    );
-  }
-}
-
-const FixtureSelect = connect(state => {
-  return {
-    fixtures: state.fixtures
-  };
-})(FixtureSelectPre);
+import { FixtureMultiSelect, FixtureSelect } from "./fixture-selects";
 
 class FilterEditor extends Component {
   constructor(props) {
@@ -107,7 +11,7 @@ class FilterEditor extends Component {
 
     this.state = {
       payor: 0,
-      specialty: 0,
+      specialties: 0,
       gender: 0,
       language: 0,
       modality: 0,
@@ -124,9 +28,6 @@ class FilterEditor extends Component {
     };
 
     this.lastAddressSearched = "";
-
-    this.specialtyOptions = [];
-    this.regenerateSpecialtyOptions(this.props);
 
     this.genderOptions = [
       <option key={"0"} value={"0"}>
@@ -159,22 +60,10 @@ class FilterEditor extends Component {
     this.keywordInputKeyUp = this.keywordInputKeyUp.bind(this);
   }
 
-  regenerateSpecialtyOptions(props) {
-    this.specialtyOptions = Object.entries(props.fixtures.specialties).map(
-      a => a
-    );
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (this.props.fixtures.specialties !== nextProps.fixtures.specialties) {
-      this.regenerateSpecialtyOptions(nextProps);
-    }
-  }
-
   filterStateHasChanged() {
     const newFilterState = {
       payor: this.state.payor,
-      specialty: this.state.specialty,
+      specialties: this.state.specialties,
       radius: this.state.radius,
       gender: this.state.gender,
       contact: !!this.state.contact,
@@ -201,10 +90,8 @@ class FilterEditor extends Component {
     this.setState({ payor: idx }, () => this.filterStateHasChanged());
   }
 
-  specialtySelectChanged(elt) {
-    this.setState({ specialty: elt.target.value }, () =>
-      this.filterStateHasChanged()
-    );
+  specialtySelectChanged(values) {
+    this.setState({ specialties: values }, () => this.filterStateHasChanged());
   }
 
   modalitySelectChanged(value) {
@@ -422,29 +309,11 @@ class FilterEditor extends Component {
           callback={this.payorSelectChanged}
         />
 
-        <label className="pt-label">
-          Specialty
-          <MultiSelect
-            itemRenderer={([idx, value], { handleClick, index, modifiers }) => {
-              return (
-                <MenuItem
-                  key={idx}
-                  label={idx}
-                  text={value}
-                  onClick={handleClick}
-                />
-              );
-            }}
-            items={this.specialtyOptions}
-            noResults={<MenuItem key={0} disabled={true} text="No results." />}
-            initialConent={<MenuItem disabled={true} text={`Languages`} />}
-            onItemSelect={val => console.log(val)}
-            tagRenderer={a => {
-              debugger;
-              return a;
-            }}
-          />
-        </label>
+        <FixtureMultiSelect
+          displayName={"Specialties"}
+          propertyName={"specialties"}
+          callback={this.specialtySelectChanged}
+        />
 
         <FixtureSelect
           displayName={"Modality"}

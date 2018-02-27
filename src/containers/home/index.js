@@ -44,7 +44,7 @@ class Home extends Component {
 
     this.filters = {
       payor: 0,
-      specialty: 0,
+      specialties: [],
       coordinates: null,
       radius: 1,
       gender: 0,
@@ -79,8 +79,10 @@ class Home extends Component {
       delete params.payor;
     }
 
-    if (params.specialty < 1) {
-      delete params.specialty;
+    if (params.specialties.length < 1) {
+      delete params.specialties;
+    } else {
+      params.specialties = params.specialties.join(",");
     }
 
     if (params.gender < 1) {
