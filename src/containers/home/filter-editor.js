@@ -82,6 +82,7 @@ class FixtureSelectPre extends Component {
             noResults={<MenuItem key={0} disabled={true} text="No results." />}
             itemPredicate={FixtureSelectPre.valuePredicate}
             itemRenderer={FixtureSelectPre.renderItem}
+            popoverProps={{ minimal: false }}
           >
             <Button text={btnText} rightIcon="caret-down" />
           </Select>
