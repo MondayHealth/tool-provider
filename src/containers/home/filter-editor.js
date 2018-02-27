@@ -11,7 +11,7 @@ class FilterEditor extends Component {
 
     this.state = {
       payor: 0,
-      specialties: 0,
+      specialties: [],
       gender: 0,
       language: 0,
       modality: 0,
