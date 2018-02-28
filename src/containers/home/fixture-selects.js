@@ -3,7 +3,7 @@ import { Button, MenuItem } from "@blueprintjs/core";
 import { MultiSelect, Select } from "@blueprintjs/select";
 import { connect } from "react-redux";
 
-class FixtureSelectPre extends Component {
+class FixtureSelectBase extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -13,6 +13,8 @@ class FixtureSelectPre extends Component {
     this.cb = this.cb.bind(this);
 
     this.elementList = [];
+
+    this.insertBlank = true;
   }
 
   componentWillReceiveProps(nextProps) {
@@ -29,10 +31,10 @@ class FixtureSelectPre extends Component {
       return;
     }
 
-    if (Array.isArray(nextFixture)) {
-      this.elementList = nextFixture.map((t, i) => [i, t]);
-    } else {
-      this.elementList = Object.entries(nextFixture);
+    this.elementList = Object.entries(nextFixture);
+
+    if (this.insertBlank) {
+      this.elementList.unshift([0, "None"]);
     }
   }
 
@@ -60,7 +62,7 @@ class FixtureSelectPre extends Component {
   }
 
   render() {
-    const btnText = this.state.selectionName || this.props.displayName;
+    const btnText = this.state.selectionName || "None";
 
     return (
       <label className="pt-label fixture-select">
@@ -69,8 +71,8 @@ class FixtureSelectPre extends Component {
           items={this.elementList}
           onItemSelect={this.cb}
           noResults={<MenuItem key={0} disabled={true} text="No results." />}
-          itemPredicate={FixtureSelectPre.valuePredicate}
-          itemRenderer={FixtureSelectPre.renderItem}
+          itemPredicate={FixtureSelectBase.valuePredicate}
+          itemRenderer={FixtureSelectBase.renderItem}
         >
           <Button
             className={"pt-align-left"}
@@ -85,7 +87,7 @@ class FixtureSelectPre extends Component {
   }
 }
 
-class FixtureMultiSelectPre extends FixtureSelectPre {
+class FixtureMultiSelectPre extends FixtureSelectBase {
   constructor(props) {
     super(props);
 
@@ -96,6 +98,8 @@ class FixtureMultiSelectPre extends FixtureSelectPre {
     this.selectedIndicies = new Set();
 
     this.toggleProp = this.toggleProp.bind(this);
+
+    this.insertBlank = false;
   }
 
   toggleProp(index) {
@@ -146,6 +150,6 @@ const connectState = state => {
   };
 };
 
-export const FixtureSelect = connect(connectState)(FixtureSelectPre);
+export const FixtureSelect = connect(connectState)(FixtureSelectBase);
 
 export const FixtureMultiSelect = connect(connectState)(FixtureMultiSelectPre);

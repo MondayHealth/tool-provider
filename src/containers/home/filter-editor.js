@@ -21,6 +21,7 @@ class FilterEditor extends Component {
       coordinate: null,
       addressInputValidity: null,
       radius: 1,
+      practiceAge: 0,
       contact: false,
       freeConsult: false,
       freeInputValue: "",
@@ -49,6 +50,8 @@ class FilterEditor extends Component {
     this.geocodeResponse = this.geocodeResponse.bind(this);
     this.radiusSliderChange = this.radiusSliderChange.bind(this);
     this.radiusSliderReleased = this.radiusSliderReleased.bind(this);
+    this.practiceAgeSliderChange = this.practiceAgeSliderChange.bind(this);
+    this.practiceAgeSliderReleased = this.practiceAgeSliderReleased.bind(this);
     this.genderSelectChanged = this.genderSelectChanged.bind(this);
     this.contactInfoChanged = this.contactInfoChanged.bind(this);
     this.freeConsultChanged = this.freeConsultChanged.bind(this);
@@ -65,6 +68,7 @@ class FilterEditor extends Component {
       payor: this.state.payor,
       specialties: this.state.specialties,
       radius: this.state.radius,
+      practiceAge: this.state.practiceAge,
       gender: this.state.gender,
       contact: !!this.state.contact,
       language: this.state.language,
@@ -103,6 +107,13 @@ class FilterEditor extends Component {
 
   radiusSliderReleased(value) {
     this.setState({ radius: value }, () => this.filterStateHasChanged());
+  }
+  practiceAgeSliderChange(value) {
+    this.setState({ practiceAge: value });
+  }
+
+  practiceAgeSliderReleased(value) {
+    this.setState({ practiceAge: value }, () => this.filterStateHasChanged());
   }
 
   feeRangeSliderChange(value) {
@@ -232,6 +243,18 @@ class FilterEditor extends Component {
       );
     }
 
+    let planList = null;
+
+    if (this.state.payor > 0) {
+      planList = (
+        <FixtureMultiSelect
+          displayName={"Plans"}
+          propertyName={"plans"}
+          callback={() => console.log(arguments)}
+        />
+      );
+    }
+
     return (
       <div className={"filter-editor"}>
         <h3>Search Filters</h3>
@@ -274,6 +297,21 @@ class FilterEditor extends Component {
         </label>
 
         <label className={"pt-label"}>
+          Practice Age
+          <div className={"slider-container"}>
+            <Slider
+              min={0}
+              max={50}
+              stepSize={1}
+              labelStepSize={10}
+              value={this.state.practiceAge}
+              onChange={this.practiceAgeSliderChange}
+              onRelease={this.practiceAgeSliderReleased}
+            />
+          </div>
+        </label>
+
+        <label className={"pt-label"}>
           Fee Range
           <div className={"slider-container"}>
             <RangeSlider
@@ -308,6 +346,8 @@ class FilterEditor extends Component {
           propertyName={"payors"}
           callback={this.payorSelectChanged}
         />
+
+        {planList}
 
         <FixtureMultiSelect
           displayName={"Specialties"}

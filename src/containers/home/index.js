@@ -50,6 +50,7 @@ class Home extends Component {
       gender: 0,
       language: 0,
       modality: 0,
+      practiceAge: 0,
       contact: false,
       freeConsult: false,
       keywords: null
@@ -107,6 +108,10 @@ class Home extends Component {
 
     if (!params.keywords) {
       delete params.keywords;
+    }
+
+    if (!params.practiceAge) {
+      delete params.practiceAge;
     }
 
     // Don't do anything if the params haven't changed
