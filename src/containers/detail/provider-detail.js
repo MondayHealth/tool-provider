@@ -86,6 +86,31 @@ const FixtureList = connect(state => {
   return { fixtures: state.fixtures };
 })(FixtureListBase);
 
+class PlanListBase extends FixtureListBase {
+  name() {
+    return "plans";
+  }
+
+  getContent() {
+    const plans = this.props.fixtures.plans;
+    const payors = this.props.fixtures.payors;
+    const list = this.value().map((value, idx) => {
+      const plan = plans[value];
+      const payorName = payors[plan.payorId];
+      return (
+        <span key={idx}>
+          {plan.name} ({payorName})
+        </span>
+      );
+    });
+    return <div>{list}</div>;
+  }
+}
+
+const PlanList = connect(state => {
+  return { fixtures: state.fixtures };
+})(PlanListBase);
+
 class AddressListBase extends StringList {
   name() {
     return "addresses";
@@ -191,7 +216,7 @@ class ProviderDetail extends Component {
 
         <AddressList elt={elt} />
         <LicenseList elt={elt} />
-        <FixtureList elt={elt} name={"plans"} />
+        <PlanList elt={elt} />
       </div>
     );
   }

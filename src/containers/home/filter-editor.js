@@ -3,7 +3,11 @@ import { connect } from "react-redux";
 import { TopToaster } from "../../toaster";
 import { Intent, RangeSlider, Slider, Spinner } from "@blueprintjs/core";
 import { geocode } from "../../util/gmaps";
-import { FixtureMultiSelect, FixtureSelect } from "./fixture-selects";
+import {
+  FixtureMultiSelect,
+  FixtureSelect,
+  PayorSelect
+} from "./fixture-selects";
 
 class FilterEditor extends Component {
   constructor(props) {
@@ -11,6 +15,7 @@ class FilterEditor extends Component {
 
     this.state = {
       payor: 0,
+      plan: 0,
       specialties: [],
       gender: 0,
       language: 0,
@@ -61,11 +66,13 @@ class FilterEditor extends Component {
     this.modalitySelectChanged = this.modalitySelectChanged.bind(this);
     this.keywordInputChanged = this.keywordInputChanged.bind(this);
     this.keywordInputKeyUp = this.keywordInputKeyUp.bind(this);
+    this.planSelectChanged = this.planSelectChanged.bind(this);
   }
 
   filterStateHasChanged() {
     const newFilterState = {
       payor: this.state.payor,
+      plan: this.state.plan,
       specialties: this.state.specialties,
       radius: this.state.radius,
       practiceAge: this.state.practiceAge,
@@ -185,6 +192,10 @@ class FilterEditor extends Component {
     this.setState({ language: idx }, () => this.filterStateHasChanged());
   }
 
+  planSelectChanged(idx) {
+    this.setState({ plan: idx }, () => this.filterStateHasChanged());
+  }
+
   contactInfoChanged(evt) {
     this.setState({ contact: evt.target.checked }, () =>
       this.filterStateHasChanged()
@@ -247,10 +258,9 @@ class FilterEditor extends Component {
 
     if (this.state.payor > 0) {
       planList = (
-        <FixtureMultiSelect
-          displayName={"Plans"}
-          propertyName={"plans"}
-          callback={() => console.log(arguments)}
+        <PayorSelect
+          payor={this.state.payor}
+          callback={this.planSelectChanged}
         />
       );
     }

@@ -44,6 +44,7 @@ class Home extends Component {
 
     this.filters = {
       payor: 0,
+      plan: 0,
       specialties: [],
       coordinates: null,
       radius: 1,
@@ -112,6 +113,14 @@ class Home extends Component {
 
     if (!params.practiceAge) {
       delete params.practiceAge;
+    }
+
+    if (params.payor) {
+      if (params.plan) {
+        delete params.payor;
+      } else {
+        delete params.plan;
+      }
     }
 
     // Don't do anything if the params haven't changed

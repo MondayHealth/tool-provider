@@ -44,7 +44,8 @@ class FixtureSelectBase extends Component {
   }
 
   static valuePredicate(pred, [index, value]) {
-    return !pred ? true : value.indexOf(pred.trim()) > -1;
+    const val = pred.trim().toLowerCase();
+    return !val ? true : value.toLowerCase().indexOf(val) > -1;
   }
 
   static renderItem([idx, value], { handleClick, modifiers }) {
@@ -144,6 +145,31 @@ class FixtureMultiSelectPre extends FixtureSelectBase {
   }
 }
 
+class PayorSelectBase extends FixtureSelectBase {
+  componentWillReceiveProps(nextProps) {
+    const currentFixture = this.props.fixtures.plans;
+    const nextFixture = nextProps.fixtures ? nextProps.fixtures.plans : null;
+    const nextPayor = nextProps.payor ? parseInt(nextProps.payor, 10) : null;
+
+    if (currentFixture === nextFixture && this.props.payor === nextPayor) {
+      return;
+    }
+
+    if (!nextFixture || !nextPayor) {
+      this.elementList = [];
+      return;
+    }
+
+    this.elementList = Object.entries(nextFixture)
+      .filter(([index, value]) => value.payorId === nextPayor)
+      .map(([index, value]) => [index, value.name]);
+
+    if (this.insertBlank) {
+      this.elementList.unshift([0, "(All Plans)"]);
+    }
+  }
+}
+
 const connectState = state => {
   return {
     fixtures: state.fixtures
@@ -151,5 +177,7 @@ const connectState = state => {
 };
 
 export const FixtureSelect = connect(connectState)(FixtureSelectBase);
+
+export const PayorSelect = connect(connectState)(PayorSelectBase);
 
 export const FixtureMultiSelect = connect(connectState)(FixtureMultiSelectPre);
