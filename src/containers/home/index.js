@@ -10,15 +10,15 @@ import { METERS_PER_MILE } from "../../util/gmaps";
 import ProviderDetail from "../detail/provider-detail";
 
 function shallowEquals(a, b) {
-  let keys = Object.keys(a);
-  for (let key in keys) {
+  for (let key in a) {
+    // noinspection JSUnfilteredForInLoop
     if (!(key in b) || a[key] !== b[key]) {
       return false;
     }
   }
 
-  keys = Object.keys(b);
-  for (let key in keys) {
+  for (let key in b) {
+    // noinspection JSUnfilteredForInLoop
     if (!(key in a) || a[key] !== b[key]) {
       return false;
     }

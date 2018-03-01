@@ -254,17 +254,6 @@ class FilterEditor extends Component {
       );
     }
 
-    let planList = null;
-
-    if (this.state.payor > 0) {
-      planList = (
-        <PayorSelect
-          payor={this.state.payor}
-          callback={this.planSelectChanged}
-        />
-      );
-    }
-
     return (
       <div className={"filter-editor"}>
         <h3>Search Filters</h3>
@@ -357,7 +346,10 @@ class FilterEditor extends Component {
           callback={this.payorSelectChanged}
         />
 
-        {planList}
+        <PayorSelect
+          payor={this.state.payor}
+          callback={this.planSelectChanged}
+        />
 
         <FixtureMultiSelect
           displayName={"Specialties"}

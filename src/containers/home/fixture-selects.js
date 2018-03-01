@@ -65,6 +65,8 @@ class FixtureSelectBase extends Component {
   render() {
     const btnText = this.state.selectionName || "None";
 
+    const empty = this.elementList.length < 1;
+
     return (
       <label className="pt-label fixture-select">
         {this.props.displayName}
@@ -74,13 +76,15 @@ class FixtureSelectBase extends Component {
           noResults={<MenuItem key={0} disabled={true} text="No results." />}
           itemPredicate={FixtureSelectBase.valuePredicate}
           itemRenderer={FixtureSelectBase.renderItem}
+          disabled={empty}
         >
           <Button
             className={"pt-align-left"}
             // This causes an error/warning in React!
             // alignText={Alignment.LEFT}
-            text={btnText}
+            text={empty ? "None" : btnText}
             rightIcon="caret-down"
+            disabled={empty}
           />
         </Select>
       </label>
@@ -147,9 +151,11 @@ class FixtureMultiSelectPre extends FixtureSelectBase {
 
 class PayorSelectBase extends FixtureSelectBase {
   componentWillReceiveProps(nextProps) {
-    const currentFixture = this.props.fixtures.plans;
+    const currentFixture = this.props.fixtures
+      ? this.props.fixtures.plans
+      : null;
     const nextFixture = nextProps.fixtures ? nextProps.fixtures.plans : null;
-    const nextPayor = nextProps.payor ? parseInt(nextProps.payor, 10) : null;
+    const nextPayor = nextProps.payor ? parseInt(nextProps.payor, 10) : 0;
 
     if (currentFixture === nextFixture && this.props.payor === nextPayor) {
       return;
@@ -164,8 +170,14 @@ class PayorSelectBase extends FixtureSelectBase {
       .filter(([index, value]) => value.payorId === nextPayor)
       .map(([index, value]) => [index, value.name]);
 
+    const blank = [0, "(All Plans)"];
+
     if (this.insertBlank) {
-      this.elementList.unshift([0, "(All Plans)"]);
+      this.elementList.unshift(blank);
+    }
+
+    if (nextPayor !== this.props.payor) {
+      this.cb(blank);
     }
   }
 }
