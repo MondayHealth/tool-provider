@@ -1,31 +1,53 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { TopToaster } from "../../toaster";
-import { Intent, Slider, Spinner } from "@blueprintjs/core";
+import { Intent, RangeSlider, Slider, Spinner } from "@blueprintjs/core";
 import { geocode } from "../../util/gmaps";
+import {
+  FixtureMultiSelect,
+  FixtureSelect,
+  PayorSelect
+} from "./fixture-selects";
 
 class FilterEditor extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      payor: "0",
-      specialty: "0",
+      payor: 0,
+      plan: 0,
+      specialties: [],
+      gender: 0,
+      language: 0,
+      modality: 0,
+      feeRange: [0, 500],
       processingAddress: false,
       addressInputValue: "",
       coordinate: null,
       addressInputValidity: null,
-      radius: 1
+      radius: 1,
+      practiceAge: 0,
+      contact: false,
+      freeConsult: false,
+      freeInputValue: "",
+      keywords: ""
     };
 
     this.lastAddressSearched = "";
 
-    this.payorOptions = [];
-    this.specialtyOptions = [];
-    this.regeneratePayorOptions(this.props);
-    this.regenerateSpecialtyOptions(this.props);
+    this.genderOptions = [
+      <option key={"0"} value={"0"}>
+        None
+      </option>,
+      <option key={"1"} value={"1"}>
+        Female
+      </option>,
+      <option key={"2"} value={"2"}>
+        Male
+      </option>
+    ];
 
-    this.insuranceSelectChanged = this.insuranceSelectChanged.bind(this);
+    this.payorSelectChanged = this.payorSelectChanged.bind(this);
     this.specialtySelectChanged = this.specialtySelectChanged.bind(this);
     this.addressChanged = this.addressChanged.bind(this);
     this.addressInputKeyUp = this.addressInputKeyUp.bind(this);
@@ -33,52 +55,39 @@ class FilterEditor extends Component {
     this.geocodeResponse = this.geocodeResponse.bind(this);
     this.radiusSliderChange = this.radiusSliderChange.bind(this);
     this.radiusSliderReleased = this.radiusSliderReleased.bind(this);
-  }
-
-  regeneratePayorOptions(props) {
-    this.payorOptions = props.fixtures.payors.map((value, index) => (
-      <option key={index} value={index}>
-        {value}
-      </option>
-    ));
-
-    this.payorOptions.unshift(
-      <option key={"0"} value="0">
-        None
-      </option>
-    );
-  }
-
-  regenerateSpecialtyOptions(props) {
-    this.specialtyOptions = Object.entries(props.fixtures.specialties).map(
-      ([index, value]) => (
-        <option key={index} value={index}>
-          {value}
-        </option>
-      )
-    );
-    this.specialtyOptions.unshift(
-      <option key={"0"} value="0">
-        None
-      </option>
-    );
-  }
-
-  componentWillReceiveProps(nextProps) {
-    if (this.props.fixtures.payors !== nextProps.fixtures.payors) {
-      this.regeneratePayorOptions(nextProps);
-    }
-    if (this.props.fixtures.specialties !== nextProps.fixtures.specialties) {
-      this.regenerateSpecialtyOptions(nextProps);
-    }
+    this.practiceAgeSliderChange = this.practiceAgeSliderChange.bind(this);
+    this.practiceAgeSliderReleased = this.practiceAgeSliderReleased.bind(this);
+    this.genderSelectChanged = this.genderSelectChanged.bind(this);
+    this.contactInfoChanged = this.contactInfoChanged.bind(this);
+    this.freeConsultChanged = this.freeConsultChanged.bind(this);
+    this.languageSelectChanged = this.languageSelectChanged.bind(this);
+    this.feeRangeSliderChange = this.feeRangeSliderChange.bind(this);
+    this.feeRangeSliderReleased = this.feeRangeSliderReleased.bind(this);
+    this.modalitySelectChanged = this.modalitySelectChanged.bind(this);
+    this.keywordInputChanged = this.keywordInputChanged.bind(this);
+    this.keywordInputKeyUp = this.keywordInputKeyUp.bind(this);
+    this.planSelectChanged = this.planSelectChanged.bind(this);
   }
 
   filterStateHasChanged() {
     const newFilterState = {
       payor: this.state.payor,
-      specialty: this.state.specialty,
-      radius: this.state.radius
+      plan: this.state.plan,
+      specialties: this.state.specialties,
+      radius: this.state.radius,
+      practiceAge: this.state.practiceAge,
+      gender: this.state.gender,
+      contact: !!this.state.contact,
+      language: this.state.language,
+      modality: this.state.modality,
+      freeConsult: this.state.freeConsult,
+      keywords: this.state.keywords
     };
+
+    let [min, max] = this.state.feeRange;
+    if (min !== 0 || max !== 500) {
+      newFilterState.feeRange = `${min},${max}`;
+    }
 
     if (this.state.coordinates) {
       newFilterState.lat = this.state.coordinates.lat;
@@ -88,24 +97,38 @@ class FilterEditor extends Component {
     this.props.onFiltersChanged(newFilterState);
   }
 
-  insuranceSelectChanged(elt) {
-    this.setState({ payor: elt.target.value }, () =>
-      this.filterStateHasChanged()
-    );
+  payorSelectChanged(idx) {
+    this.setState({ payor: idx }, () => this.filterStateHasChanged());
   }
 
-  specialtySelectChanged(elt) {
-    this.setState({ specialty: elt.target.value }, () =>
-      this.filterStateHasChanged()
-    );
+  specialtySelectChanged(values) {
+    this.setState({ specialties: values }, () => this.filterStateHasChanged());
   }
 
+  modalitySelectChanged(value) {
+    this.setState({ modality: value }, () => this.filterStateHasChanged());
+  }
   radiusSliderChange(value) {
     this.setState({ radius: value });
   }
 
   radiusSliderReleased(value) {
     this.setState({ radius: value }, () => this.filterStateHasChanged());
+  }
+  practiceAgeSliderChange(value) {
+    this.setState({ practiceAge: value });
+  }
+
+  practiceAgeSliderReleased(value) {
+    this.setState({ practiceAge: value }, () => this.filterStateHasChanged());
+  }
+
+  feeRangeSliderChange(value) {
+    this.setState({ feeRange: value });
+  }
+
+  feeRangeSliderReleased(value) {
+    this.setState({ feeRange: value }, () => this.filterStateHasChanged());
   }
 
   addressChanged(newVal) {
@@ -159,6 +182,32 @@ class FilterEditor extends Component {
     );
   }
 
+  genderSelectChanged(evt) {
+    this.setState({ gender: evt.target.value }, () =>
+      this.filterStateHasChanged()
+    );
+  }
+
+  languageSelectChanged(idx) {
+    this.setState({ language: idx }, () => this.filterStateHasChanged());
+  }
+
+  planSelectChanged(idx) {
+    this.setState({ plan: idx }, () => this.filterStateHasChanged());
+  }
+
+  contactInfoChanged(evt) {
+    this.setState({ contact: evt.target.checked }, () =>
+      this.filterStateHasChanged()
+    );
+  }
+
+  freeConsultChanged(evt) {
+    this.setState({ freeConsult: evt.target.checked }, () =>
+      this.filterStateHasChanged()
+    );
+  }
+
   addressInputChanged(evt) {
     this.setState({ addressInputValue: evt.target.value });
   }
@@ -167,6 +216,28 @@ class FilterEditor extends Component {
     if (evt.keyCode === 13) {
       this.addressChanged(evt.target.value.trim());
     }
+  }
+
+  keywordInputChanged(evt) {
+    this.setState({ keywords: evt.target.value });
+  }
+
+  static keywordReducer(acc, elt) {
+    const e = elt.trim();
+    return e ? acc + " " + e : acc;
+  }
+
+  keywordInputKeyUp(evt) {
+    if (evt.keyCode !== 13) {
+      return;
+    }
+
+    let val = evt.target.value
+      .replace(/[|&;$%@:*,./'"<>()+]/g, "")
+      .split(" ")
+      .reduce(FilterEditor.keywordReducer);
+
+    this.setState({ keywords: val }, () => this.filterStateHasChanged());
   }
 
   render() {
@@ -186,6 +257,7 @@ class FilterEditor extends Component {
     return (
       <div className={"filter-editor"}>
         <h3>Search Filters</h3>
+
         <div
           className={
             "pt-input-group address-search " +
@@ -223,34 +295,110 @@ class FilterEditor extends Component {
           </div>
         </label>
 
+        <label className={"pt-label"}>
+          Practice Age
+          <div className={"slider-container"}>
+            <Slider
+              min={0}
+              max={50}
+              stepSize={1}
+              labelStepSize={10}
+              value={this.state.practiceAge}
+              onChange={this.practiceAgeSliderChange}
+              onRelease={this.practiceAgeSliderReleased}
+            />
+          </div>
+        </label>
+
+        <label className={"pt-label"}>
+          Fee Range
+          <div className={"slider-container"}>
+            <RangeSlider
+              min={0}
+              max={500}
+              stepSize={10}
+              labelStepSize={150}
+              value={this.state.feeRange}
+              onChange={this.feeRangeSliderChange}
+              onRelease={this.feeRangeSliderReleased}
+            />
+          </div>
+        </label>
+
+        <label className={"pt-label"}>
+          Group / Orientation
+          <div className={"pt-input-group"}>
+            <span className="pt-icon pt-icon-search" />
+            <input
+              type="text"
+              className="pt-input"
+              placeholder="Enter Keywords"
+              onKeyUp={this.keywordInputKeyUp}
+              onChange={this.keywordInputChanged}
+              value={this.state.keywords}
+            />
+          </div>
+        </label>
+
+        <FixtureSelect
+          displayName={"Payor"}
+          propertyName={"payors"}
+          callback={this.payorSelectChanged}
+        />
+
+        <PayorSelect
+          payor={this.state.payor}
+          callback={this.planSelectChanged}
+        />
+
+        <FixtureMultiSelect
+          displayName={"Specialties"}
+          propertyName={"specialties"}
+          callback={this.specialtySelectChanged}
+        />
+
+        <FixtureSelect
+          displayName={"Modality"}
+          propertyName={"modalities"}
+          callback={this.modalitySelectChanged}
+        />
+
         <label className="pt-label">
-          Payor
+          Gender
           <div className="pt-select">
             <select
-              defaultValue={this.state.payor}
-              onChange={this.insuranceSelectChanged}
+              defaultValue={this.state.gender}
+              onChange={this.genderSelectChanged}
             >
-              {this.payorOptions}
+              {this.genderOptions}
             </select>
           </div>
         </label>
 
-        <label className="pt-label">
-          Specialty
-          <div className="pt-select">
-            <select
-              defaultValue={this.state.specialty}
-              onChange={this.specialtySelectChanged}
-            >
-              {this.specialtyOptions}
-            </select>
-          </div>
+        <FixtureSelect
+          displayName={"Language"}
+          propertyName={"languages"}
+          callback={this.languageSelectChanged}
+        />
+
+        <label className="pt-control pt-checkbox pt-large">
+          <input
+            type="checkbox"
+            defaultValue={this.state.contact}
+            onChange={this.contactInfoChanged}
+          />
+          <span className="pt-control-indicator" />
+          Has Contact Info
         </label>
 
         <label className="pt-control pt-checkbox pt-large">
-          <input type="checkbox" />
+          <input
+            type="checkbox"
+            defaultValue={this.state.freeConsult}
+            onChange={this.freeConsultChanged}
+          />
           <span className="pt-control-indicator" />
-          Has Contact Info
+          Free Consult
         </label>
       </div>
     );

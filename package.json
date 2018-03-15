@@ -3,13 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@blueprintjs/core": "^1.35.0",
+    "@blueprintjs/core": "^2.0.0-rc.2",
+    "@blueprintjs/icons": "^2.0.0-rc.2",
+    "@blueprintjs/select": "^2.0.0-rc.2",
     "history": "^4.7.2",
     "prop-types": "^15.6.0",
     "react": "^16.2.0",
-    "react-addons-css-transition-group": "^15.6.2",
     "react-dom": "^16.2.0",
-    "react-scripts": "1.1.0"
+    "react-scripts": "1.1.0",
+    "react-transition-group": "^2.2.1"
   },
   "scripts": {
     "build-css": "node-sass-chokidar --importer node_modules/node-sass-tilde-importer/index.js --include-path ./src src/ -o src/",

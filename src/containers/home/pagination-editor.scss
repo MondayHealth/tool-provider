@@ -1,0 +1,42 @@
+@import "../../../node_modules/@blueprintjs/core/lib/scss/variables";
+
+.pagination-editor
+{
+  display: flex;
+  width: 100%;
+
+  background-color: $light-gray2;
+  padding: 10px;
+  color: $gray3;
+
+  span
+  {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+  }
+
+  .pt-form-group
+  {
+    margin: 0;
+    padding-right: 5px;
+
+    input
+    {
+      padding-left: 7px;
+    }
+  }
+
+  .pt-numeric-input
+  {
+    max-width: 88px;
+  }
+
+  .pt-select
+  {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+}
+

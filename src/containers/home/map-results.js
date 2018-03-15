@@ -4,6 +4,7 @@ import { connect } from "react-redux";
 import { Spinner } from "@blueprintjs/core";
 import PropTypes from "prop-types";
 import Map from "../../util/gmaps";
+import { loadDetailByID, mouseOverProviderByID } from "../../state/api/actions";
 
 class MapResults extends Component {
   constructor(props) {
@@ -18,6 +19,13 @@ class MapResults extends Component {
     const node = ReactDOM.findDOMNode(this.refs.map);
     this.map = new Map(node, null);
     this.map.setMouseOverFunction(this.props.mouseOverHandler);
+    this.map.setClickHandlerFunction(this.mapPinClicked.bind(this));
+  }
+
+  mapPinClicked(ids) {
+    if (ids) {
+      this.props.setDetailID(ids.values().next().value);
+    }
   }
 
   updatePins() {
@@ -50,25 +58,34 @@ class MapResults extends Component {
       this.setState({ loading: false }, () => this.loadMap());
     }
 
-    if (this.map && this.props.center) {
-      this.map.center(this.props.center);
-      this.map.circle(this.props.radius);
-      this.map.fitToCircle();
-      if (!prevProps || this.props.elements !== prevProps.elements) {
-        this.updatePins();
+    if (this.map) {
+      if (this.props.center) {
+        this.map.center(this.props.center);
+        this.map.circle(this.props.radius);
       }
+      const currentID = this.props.mouseOverID.id;
+      if (!prevProps || currentID !== prevProps.mouseOverID.id) {
+        this.map.bouncePinsForID(currentID);
+      }
+      const detailID = this.props.detail.id;
+      if (detailID !== prevProps.detail.id) {
+        this.map.highlightPinsForID(detailID);
+      }
+    }
+
+    if (!prevProps || this.props.elements !== prevProps.elements) {
+      this.updatePins();
     }
   }
 
   render() {
-    const spinner = this.state.loading ? <Spinner /> : null;
+    if (this.state.loading) {
+      return <Spinner />;
+    }
 
     return (
-      <div className={"map-results-container"}>
-        {spinner}
-        <div className={"results-map-wrapper"}>
-          <div ref="map" className={"results-map"} />
-        </div>
+      <div className={"results-map-wrapper"}>
+        <div ref="map" className={"results-map"} />
       </div>
     );
   }
@@ -83,8 +100,17 @@ MapResults.propTypes = {
 
 const mapStateToProps = state => {
   return {
-    maps: state.maps
+    maps: state.maps,
+    mouseOverID: state.mouseOverProviderID,
+    detail: state.detail
   };
 };
 
-export default connect(mapStateToProps)(MapResults);
+const mapDispatchToProps = dispatch => {
+  return {
+    setDetailID: loadDetailByID(dispatch),
+    mouseOverProvider: mouseOverProviderByID(dispatch)
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(MapResults);

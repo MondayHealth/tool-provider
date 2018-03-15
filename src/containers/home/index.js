@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { providerCount, providerList } from "../../state/api/actions";
+import { providerList } from "../../state/api/actions";
 
 import ProviderResultList from "./provider-result-list";
 import PaginationEditor from "./pagination-editor";
@@ -10,15 +10,15 @@ import { METERS_PER_MILE } from "../../util/gmaps";
 import ProviderDetail from "../detail/provider-detail";
 
 function shallowEquals(a, b) {
-  let keys = Object.keys(a);
-  for (let key in keys) {
+  for (let key in a) {
+    // noinspection JSUnfilteredForInLoop
     if (!(key in b) || a[key] !== b[key]) {
       return false;
     }
   }
 
-  keys = Object.keys(b);
-  for (let key in keys) {
+  for (let key in b) {
+    // noinspection JSUnfilteredForInLoop
     if (!(key in a) || a[key] !== b[key]) {
       return false;
     }
@@ -44,12 +44,18 @@ class Home extends Component {
 
     this.filters = {
       payor: 0,
-      specialty: 0,
+      plan: 0,
+      specialties: [],
       coordinates: null,
-      radius: 1
+      radius: 1,
+      gender: 0,
+      language: 0,
+      modality: 0,
+      practiceAge: 0,
+      contact: false,
+      freeConsult: false,
+      keywords: null
     };
-
-    this.initialCount = 50;
 
     this.offsetChanged = this.offsetChanged.bind(this);
     this.filtersChanged = this.filtersChanged.bind(this);
@@ -59,7 +65,6 @@ class Home extends Component {
   }
 
   componentWillMount() {
-    this.props.loadProviderCount();
     this.reload();
   }
 
@@ -76,8 +81,46 @@ class Home extends Component {
       delete params.payor;
     }
 
-    if (params.specialty < 1) {
-      delete params.specialty;
+    if (params.specialties.length < 1) {
+      delete params.specialties;
+    } else {
+      params.specialties = params.specialties.join(",");
+    }
+
+    if (params.gender < 1) {
+      delete params.gender;
+    }
+
+    if (params.modality < 1) {
+      delete params.modality;
+    }
+
+    if (params.language < 1) {
+      delete params.language;
+    }
+
+    if (!params.contact) {
+      delete params.contact;
+    }
+
+    if (!params.freeConsult) {
+      delete params.freeConsult;
+    }
+
+    if (!params.keywords) {
+      delete params.keywords;
+    }
+
+    if (!params.practiceAge) {
+      delete params.practiceAge;
+    }
+
+    if (params.payor) {
+      if (params.plan) {
+        delete params.payor;
+      } else {
+        delete params.plan;
+      }
     }
 
     // Don't do anything if the params haven't changed
@@ -110,20 +153,14 @@ class Home extends Component {
 
   render() {
     return (
-      <div>
-        <div className="home-content-container">
-          <FilterEditor onFiltersChanged={this.filtersChanged} />
-          <div className="home-results-container">
-            <PaginationEditor
-              total={this.props.provider.serverCount}
-              initialCount={this.initialCount}
-              onOffsetChanged={this.offsetChanged}
-            />
-            <ProviderResultList
-              elements={this.props.provider.byID}
-              selected={this.state.selectedID}
-            />
-          </div>
+      <div className="home-content-container">
+        <FilterEditor onFiltersChanged={this.filtersChanged} />
+        <div className="home-results-container">
+          <PaginationEditor onOffsetChanged={this.offsetChanged} />
+          <ProviderResultList elements={this.props.provider.byID} />
+        </div>
+
+        <div className={"side-bar-container"}>
           <MapResults
             center={this.state.center}
             radius={this.state.radius}
@@ -145,7 +182,6 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    loadProviderCount: providerCount(dispatch),
     requery: providerList(dispatch)
   };
 };

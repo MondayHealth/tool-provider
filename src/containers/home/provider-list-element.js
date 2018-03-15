@@ -1,17 +1,27 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import ProviderName from "../detail/provider-name";
-import { selectProviderDetail } from "../../state/api/actions";
+import { loadDetailByID, mouseOverProviderByID } from "../../state/api/actions";
 
 class ProviderListElement extends Component {
   constructor(props) {
     super(props);
     this.id = this.props.elt.id;
     this.clickHandler = this.clickHandler.bind(this);
+    this.mouseEnterHandler = this.mouseEnterHandler.bind(this);
+    this.mouseLeaveHandler = this.mouseLeaveHandler.bind(this);
   }
 
   clickHandler() {
     this.props.setDetailID(this.id);
+  }
+
+  mouseEnterHandler() {
+    this.props.mouseOverProvider(this.id);
+  }
+
+  mouseLeaveHandler() {
+    this.props.mouseOverProvider(null);
   }
 
   render() {
@@ -33,15 +43,21 @@ class ProviderListElement extends Component {
       <span key={idx}>{fixtures.degrees[value]}</span>
     ));
 
-    const className =
-      "result-element" + (this.props.selected ? " res-selected" : "");
+    let className = "result-element";
+
+    if (this.props.detail.id === this.id) {
+      className += " result-selected";
+    }
 
     return (
       <div
         key={this.props.key}
         className={className}
         onClick={this.clickHandler}
+        onMouseEnter={this.mouseEnterHandler}
+        onMouseLeave={this.mouseLeaveHandler}
       >
+        <div className={"select-indicator"} />
         <ProviderName elt={elt} />
         <div className={"credentials"}>
           {degrees}
@@ -55,10 +71,17 @@ class ProviderListElement extends Component {
   }
 }
 
-const mapDispatchToProps = dispatch => {
+const dispatchToProps = dispatch => {
   return {
-    setDetailID: selectProviderDetail(dispatch)
+    setDetailID: loadDetailByID(dispatch),
+    mouseOverProvider: mouseOverProviderByID(dispatch)
   };
 };
 
-export default connect(null, mapDispatchToProps)(ProviderListElement);
+const stateToProps = state => {
+  return {
+    detail: state.detail
+  };
+};
+
+export default connect(stateToProps, dispatchToProps)(ProviderListElement);

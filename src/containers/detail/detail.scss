@@ -1,8 +1,14 @@
-@import "../../../node_modules/@blueprintjs/core/dist/variables";
+@import "../../../node_modules/@blueprintjs/core/lib/scss/variables";
 
 .provider-detail
 {
   padding: 15px;
+  height: 100%;
+
+  .no-content
+  {
+    color: $pt-text-color-disabled;
+  }
 
   .line-item-undefined, .line-list-empty
   {

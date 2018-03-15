@@ -1,9 +1,9 @@
 import {
   GOOGLE_MAPS_LOADED,
+  MOUSE_OVER_PROVIDER,
   RECEIVE_HELLO,
   RECEIVE_PROVIDER_RECORD_COUNT,
-  RECEIVE_PROVIDER_RECORD_LIST,
-  SELECT_PROVIDER_DETAIL
+  RECEIVE_PROVIDER_RECORD_LIST
 } from "./actions";
 
 // noinspection JSUnusedGlobalSymbols
@@ -55,25 +55,27 @@ export function providers(state = initialProviderState, action) {
     case RECEIVE_PROVIDER_RECORD_COUNT:
       return { ...state, serverCount: action.result };
     case RECEIVE_PROVIDER_RECORD_LIST:
-      return { ...state, byID: generateProviderIDDictionary(action.result) };
+      return {
+        ...state,
+        total: action.result.total,
+        byID: generateProviderIDDictionary(action.result.records)
+      };
     default:
       return state;
   }
 }
 
 const initialFixturesState = {
-  payors: [],
+  payors: {},
   credentials: {},
-  specialties: {}
+  specialties: {},
+  languages: {},
+  plans: {},
+  paymenttypes: {},
+  degrees: {},
+  modalities: {},
+  directories: {}
 };
-
-function generatePayorArray(data) {
-  const ret = [];
-  Object.entries(data).forEach(
-    ([key, value]) => (ret[parseInt(key, 10)] = value)
-  );
-  return ret;
-}
 
 function generateIntKeyDictionary(data) {
   const ret = {};
@@ -97,7 +99,7 @@ export function fixtures(state = initialFixturesState, action) {
 
   switch (fixture) {
     case "payors":
-      return { ...state, payors: generatePayorArray(action.result) };
+      return { ...state, payors: action.result };
     default:
       return {
         ...state,
@@ -116,10 +118,14 @@ export function detail(state = {}, action) {
 }
 
 // noinspection JSUnusedGlobalSymbols
-export function selectDetail(state = { selectedProviderID: null }, action) {
+export function mouseOverProviderID(state = { id: null }, action) {
+  if (!action || !action.type) {
+    return state;
+  }
+
   switch (action.type) {
-    case SELECT_PROVIDER_DETAIL:
-      return { ...state, selectedProviderID: action.id };
+    case MOUSE_OVER_PROVIDER:
+      return { ...state, id: action.id };
     default:
       return state;
   }

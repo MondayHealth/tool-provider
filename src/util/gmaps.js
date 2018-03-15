@@ -7,6 +7,18 @@ const CACHE = {};
 
 export const METERS_PER_MILE = 1609.34;
 
+const GREEN_PIN = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABsAAAArCAYAAAC
+JrvP4AAACBUlEQVR4AbWXvY2sMBSFKYEmKMJl0MEEJJO/hJjkRSQTEEwHzuiDJlzGic7jaLHeLGK5Nqy
+Rrizv2OfT/bO9lfWRrFdrQfjVwmogCY3b3Ot3rTtXMiAgRokuDOgx0eHBCm61iho17/Gift/gYzZ08wQ
+zFkRx2xy1fvO8TQKBGLThy4sq2xw6bl4OJigwoEKjjTesoXSkdxq6LJABPAypkmqHLt+ktwHrz/CNSq4
+tkG/Slf6nV7HqCpj7751iqj5J2rjUrPxq723UPGGf9MVRCL0a09w0r8KvA5ttoA4EcQQLZmEsEj4x/W4
+XSqiS8uUNmK+T8iaYna/JgE12KEFCsNCgLeqZ9GMYlxZ90Zy1+ENxBJtG+KLVKH1x1GcuEEX7TPrixOM
+qyNUCJ0gMYfg8iDt1eQmYdKW/v8tCh+FXQdKT7uF9ZuQu28LZEwHE/Mb8K0DpSG/PuH+JWpfmCbALN4s
+lxKJI+dTtA96XgNqn/Tnvxsa6DYxbucl9qPYL894lWq99OZxd7/1NAmmd1t957zsk9h7i+XfnU6+M8DB
+O9fOeyi+W+gdYnV8UlnevH+48/f2aV4Z3B7AbXhmN/txVpuZGA1/27qE+OuirRwlYvQ+lcdjeD2WLp0D
+UGENYCuZ7TN/f76U+kkNsAY2al4Q94z+NGjUvCXNfF6ujxngWFs0bSFzJ1z8hAMIp72QFjQAAAABJRU5
+ErkJggg==`;
+
 export function geocode(address) {
   if (address in CACHE) {
     let val = CACHE[address];
@@ -65,6 +77,10 @@ export default class Map {
     this._center = center || { lat: 40.7127753, lng: -74.0059728 };
     this._circle = null;
 
+    this._greenPinImage = {
+      url: GREEN_PIN
+    };
+
     const mapConfig = Object.assign(
       {},
       {
@@ -84,9 +100,12 @@ export default class Map {
     transitLayer.setMap(this._map);
 
     this._pins = {};
+    this._invertedPinIndex = {};
+    this._currentlyBouncingPins = null;
+    this._currentlyHighlightedPins = null;
 
     this._mouseOverHandler = null;
-    this.mouseOverProxy = this.mouseOverProxy.bind(this);
+    this._clickHandler = null;
   }
 
   static getStyles() {
@@ -107,10 +126,8 @@ export default class Map {
     this._mouseOverHandler = newFunction;
   }
 
-  mouseOverProxy(id) {
-    if (this._mouseOverHandler) {
-      this._mouseOverHandler(id);
-    }
+  setClickHandlerFunction(newFunction) {
+    this._clickHandler = newFunction;
   }
 
   circle(radius) {
@@ -129,6 +146,8 @@ export default class Map {
       this._circle.setRadius(radius * METERS_PER_MILE);
       this._circle.setCenter(this._center);
     }
+
+    this.fitToCircle();
   }
 
   fitToCircle() {
@@ -143,47 +162,139 @@ export default class Map {
     this._map.fitBounds(viewCircle.getBounds());
   }
 
+  bouncePinsForID(id) {
+    if (this._currentlyBouncingPins) {
+      this._currentlyBouncingPins.forEach(marker => marker.setAnimation(null));
+      this._currentlyBouncingPins = null;
+    }
+
+    if (!id) {
+      return;
+    }
+
+    const markerSet = this._invertedPinIndex[id];
+
+    if (!markerSet) {
+      return;
+    }
+
+    const animation = window.google.maps.Animation.BOUNCE;
+    markerSet.forEach(marker => marker.setAnimation(animation));
+    this._currentlyBouncingPins = markerSet;
+  }
+
+  highlightPinsForID(id) {
+    if (this._currentlyHighlightedPins) {
+      this._currentlyHighlightedPins.forEach(marker => marker.setIcon(null));
+      this._currentlyHighlightedPins = null;
+    }
+
+    if (!id) {
+      return;
+    }
+
+    const markerSet = this._invertedPinIndex[id];
+
+    if (!markerSet) {
+      return;
+    }
+
+    const icon = this._greenPinImage;
+    markerSet.forEach(marker => marker.setIcon(icon));
+    this._currentlyHighlightedPins = markerSet;
+  }
+
   updatePins(newPins) {
-    const center = this._circle.getCenter();
-    const radius = this._circle.getRadius();
+    const center = this._circle ? this._circle.getCenter() : null;
+    const radius = this._circle ? this._circle.getRadius() : null;
+
+    // The path to this is annoying
     const distance =
       window.google.maps.geometry.spherical.computeDistanceBetween;
 
-    let count = newPins.length;
+    const mouseOverCallback = this._mouseOverHandler;
+    const clickCallback = this._clickHandler;
+    const bounds = new window.google.maps.LatLngBounds();
+
+    // Reset this
+    this._invertedPinIndex = {};
+
+    // And this
+    this.bouncePinsForID(null);
+    this.highlightPinsForID(null);
+
+    const count = newPins.length;
     const replacement = {};
     for (let i = 0; i < count; i++) {
       let pin = newPins[i];
-      let hash = `${pin.id}${pin.lat}${pin.lng}`;
+      let hash = `${pin.lat}${pin.lng}`;
       let id = pin.id;
       let loc = new window.google.maps.LatLng(pin.lat, pin.lng);
-      let dist = distance(center, loc);
 
-      if (dist > radius) {
-        continue;
+      if (this._circle) {
+        // Don't display pins outside this circle
+        if (distance(center, loc) > radius) {
+          continue;
+        }
+      } else {
+        // If no circle, continue to calculate map bounds
+        bounds.extend(loc);
       }
 
-      if (this._pins[hash]) {
+      // If we already have a pin at this hash just save the id to it
+      if (replacement[hash]) {
+        replacement[hash].ids.add(id);
+      } else if (this._pins[hash]) {
+        // If this pin already exists but isnt found yet, save it
         replacement[hash] = this._pins[hash];
+        replacement[hash].ids = new Set([id]);
       } else {
-        replacement[hash] = new window.google.maps.Marker({
+        // We've never seen this hash before, make a new marker for it
+        const newMarker = new window.google.maps.Marker({
           position: loc,
           map: this._map
         });
 
-        replacement[hash].addListener("mouseover", () =>
-          this.mouseOverProxy(id)
-        );
+        newMarker.ids = new Set([id]);
+        newMarker.addListener("mouseover", () => {
+          if (mouseOverCallback) {
+            mouseOverCallback(newMarker.ids);
+          }
+        });
+
+        newMarker.addListener("click", () => {
+          if (clickCallback) {
+            clickCallback(newMarker.ids);
+          }
+        });
+
+        replacement[hash] = newMarker;
+      }
+
+      if (id in this._invertedPinIndex) {
+        this._invertedPinIndex[id].add(replacement[hash]);
+      } else {
+        this._invertedPinIndex[id] = new Set([replacement[hash]]);
       }
     }
 
+    // Remove all the pin objects that are no longer used
     const oldHashes = Object.keys(this._pins);
-    count = oldHashes.length;
-    for (let i = 0; i < count; i++) {
+    const oldCount = oldHashes.length;
+    for (let i = 0; i < oldCount; i++) {
       let current = oldHashes[i];
       if (!replacement[current]) {
         this._pins[current].setMap(null);
       }
     }
+
+    // Save the new pins
     this._pins = replacement;
+
+    if (this._circle) {
+      this.fitToCircle();
+    } else if (count > 0) {
+      this._map.fitBounds(bounds);
+    }
   }
 }

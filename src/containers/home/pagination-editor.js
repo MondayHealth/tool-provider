@@ -1,14 +1,19 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { Classes, NumericInput } from "@blueprintjs/core";
+import { connect } from "react-redux";
+import { providerCount } from "../../state/api/actions";
+
+import "./pagination-editor.css";
 
 class PaginationEditor extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      count: props.initialCount || 50,
+      count: 15,
       page: 1,
-      pageCount: 1
+      pageCount: 1,
+      providerTotal: 0
     };
 
     this.countChanged = this.countChanged.bind(this);
@@ -19,28 +24,47 @@ class PaginationEditor extends Component {
         {value}
       </option>
     ));
+
+    this.offset = 0;
+  }
+
+  componentWillMount() {
+    this.props.loadProviderCount();
   }
 
   componentWillReceiveProps(nextProps) {
-    if (this.props.total !== nextProps.total) {
-      let npc = Math.ceil(nextProps.total / this.state.count);
+    const total = nextProps.provider.total;
+    if (this.props.provider.total !== total) {
+      let npc = Math.ceil(total / this.state.count);
       this.setState({ pageCount: npc });
+    }
+
+    if (this.state.providerTotal !== nextProps.provider.serverCount) {
+      this.setState({ providerTotal: nextProps.provider.serverCount });
     }
   }
 
-  recalculateOffset(page, count) {
-    const offset = count * (page - 1);
-
-    if (offset < 0 || offset > this.props.total) {
+  recheckOffset() {
+    const count = this.state.count;
+    const offset = count * (this.state.page - 1);
+    if (this.offset === offset) {
       return;
     }
 
+    if (offset < 0 && offset > this.state.providerTotal) {
+      return;
+    }
+
+    this.offset = offset;
     this.props.onOffsetChanged(offset, count);
   }
 
   pageChanged(newVal) {
-    this.setState({ page: newVal });
-    this.recalculateOffset(newVal, this.state.count);
+    if (newVal < 1 || isNaN(newVal) || newVal > this.state.pageCount) {
+      return;
+    }
+
+    this.setState({ page: newVal }, this.recheckOffset.bind(this));
   }
 
   countChanged(event) {
@@ -50,9 +74,11 @@ class PaginationEditor extends Component {
       return;
     }
 
-    const newPages = Math.ceil(this.props.total / newVal);
-    this.setState({ count: newVal, pageCount: newPages });
-    this.recalculateOffset(this.state.page, newVal);
+    const newPages = Math.ceil(this.props.provider.total / newVal);
+    this.setState(
+      { count: newVal, pageCount: newPages },
+      this.recheckOffset.bind(this)
+    );
   }
 
   render() {
@@ -70,32 +96,48 @@ class PaginationEditor extends Component {
         />
       );
     } else {
-      paginator = <NumericInput value={1} disabled={true} />;
+      paginator = (
+        <NumericInput
+          className={Classes.FILL}
+          value={1}
+          max={1}
+          disabled={true}
+        />
+      );
     }
 
     return (
       <div className="pagination-editor">
-        <div className="pt-form-group pt-inline">
-          <label className="pt-label">Page</label>
-          {paginator}
-        </div>
+        <div className="pt-form-group pt-inline">{paginator}</div>
         <div className="pt-select">
           <select defaultValue={this.state.count} onChange={this.countChanged}>
             {this.options}
           </select>
         </div>
-        <span>results per page. ({this.props.total} total records.)</span>
+        <span>
+          {this.state.pageCount} pages for {this.props.provider.total} results.
+        </span>
       </div>
     );
   }
 }
 
 PaginationEditor.propTypes = {
-  total: PropTypes.number.isRequired,
   count: PropTypes.number,
   page: PropTypes.number,
-  initialCount: PropTypes.number,
   onOffsetChanged: PropTypes.func.isRequired
 };
 
-export default PaginationEditor;
+const mapStateToProps = state => {
+  return {
+    provider: state.providers
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    loadProviderCount: providerCount(dispatch)
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(PaginationEditor);
