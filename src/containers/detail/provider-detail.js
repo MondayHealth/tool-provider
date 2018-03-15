@@ -114,6 +114,30 @@ const AddressList = connect(state => {
   return { fixtures: state.fixtures };
 })(AddressListBase);
 
+class PhoneListBase extends StringList {
+  name() {
+    return "phones";
+  }
+  getContent() {
+    const directories = this.props.fixtures.directories;
+    let addresses = this.props.elt.phones.map((value, idx) => (
+      <div className={"address-item"} key={idx}>
+        <div className={"address-meta"}>
+          <span>{value.number}</span>
+          <span className={"directory"}>
+            {value.directory > -1 ? directories[value.directory] : "(Payor)"}
+          </span>
+        </div>
+      </div>
+    ));
+    return <div>{addresses}</div>;
+  }
+}
+
+const PhoneList = connect(state => {
+  return { fixtures: state.fixtures };
+})(PhoneListBase);
+
 class LicenseListBase extends StringList {
   name() {
     return "licenses";
@@ -177,6 +201,7 @@ class ProviderDetail extends Component {
         </div>
         <LineItem elt={elt} zeroIsEmpty={true} name={"beganPractice"} />
         <LineItem elt={elt} zeroIsEmpty={true} name={"yearGraduated"} />
+        <LineItem elt={elt} name={"email"} />
         <StringList elt={elt} name={"ageGroups"} />
         <StringList elt={elt} name={"ageRanges"} />
         <FixtureList elt={elt} name={"degrees"} />
@@ -186,6 +211,7 @@ class ProviderDetail extends Component {
         <StringList elt={elt} name={"orientations"} />
         <StringList elt={elt} name={"acceptedPayorComments"} />
 
+        <PhoneList elt={elt} />
         <AddressList elt={elt} />
         <LicenseList elt={elt} />
         <FixtureList elt={elt} name={"plans"} />
