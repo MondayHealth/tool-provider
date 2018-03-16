@@ -54,7 +54,8 @@ class Home extends Component {
       practiceAge: 0,
       contact: false,
       freeConsult: false,
-      keywords: null
+      keywords: null,
+      website: false
     };
 
     this.offsetChanged = this.offsetChanged.bind(this);
@@ -115,13 +116,21 @@ class Home extends Component {
       delete params.practiceAge;
     }
 
+    if (!params.website) {
+      delete params.website;
+    }
+
     if (params.payor) {
       if (params.plan) {
         delete params.payor;
       } else {
         delete params.plan;
       }
+    } else {
+      delete params.plan;
     }
+
+    console.log(params);
 
     // Don't do anything if the params haven't changed
     if (shallowEquals(params, this.currentParams)) {

@@ -9,6 +9,26 @@ import {
   PayorSelect
 } from "./fixture-selects";
 
+const CheckBox = ({ defaultValue, onChange, text }) => (
+  <label className="pt-control pt-checkbox pt-large">
+    <input type="checkbox" defaultValue={defaultValue} onChange={onChange} />
+    <span className="pt-control-indicator" />
+    {text}
+  </label>
+);
+
+const GENDER_OPTIONS = [
+  <option key={"0"} value={"0"}>
+    None
+  </option>,
+  <option key={"1"} value={"1"}>
+    Female
+  </option>,
+  <option key={"2"} value={"2"}>
+    Male
+  </option>
+];
+
 class FilterEditor extends Component {
   constructor(props) {
     super(props);
@@ -29,23 +49,12 @@ class FilterEditor extends Component {
       practiceAge: 0,
       contact: false,
       freeConsult: false,
+      website: false,
       freeInputValue: "",
       keywords: ""
     };
 
     this.lastAddressSearched = "";
-
-    this.genderOptions = [
-      <option key={"0"} value={"0"}>
-        None
-      </option>,
-      <option key={"1"} value={"1"}>
-        Female
-      </option>,
-      <option key={"2"} value={"2"}>
-        Male
-      </option>
-    ];
 
     this.payorSelectChanged = this.payorSelectChanged.bind(this);
     this.specialtySelectChanged = this.specialtySelectChanged.bind(this);
@@ -67,6 +76,9 @@ class FilterEditor extends Component {
     this.keywordInputChanged = this.keywordInputChanged.bind(this);
     this.keywordInputKeyUp = this.keywordInputKeyUp.bind(this);
     this.planSelectChanged = this.planSelectChanged.bind(this);
+    this.websiteChanged = this.websiteChanged.bind(this);
+
+    this.filterStateHasChanged = this.filterStateHasChanged.bind(this);
   }
 
   filterStateHasChanged() {
@@ -81,7 +93,8 @@ class FilterEditor extends Component {
       language: this.state.language,
       modality: this.state.modality,
       freeConsult: this.state.freeConsult,
-      keywords: this.state.keywords
+      keywords: this.state.keywords,
+      website: this.state.website
     };
 
     let [min, max] = this.state.feeRange;
@@ -98,29 +111,29 @@ class FilterEditor extends Component {
   }
 
   payorSelectChanged(idx) {
-    this.setState({ payor: idx }, () => this.filterStateHasChanged());
+    this.setState({ payor: idx }, this.filterStateHasChanged);
   }
 
   specialtySelectChanged(values) {
-    this.setState({ specialties: values }, () => this.filterStateHasChanged());
+    this.setState({ specialties: values }, this.filterStateHasChanged);
   }
 
   modalitySelectChanged(value) {
-    this.setState({ modality: value }, () => this.filterStateHasChanged());
+    this.setState({ modality: value }, this.filterStateHasChanged);
   }
   radiusSliderChange(value) {
     this.setState({ radius: value });
   }
 
   radiusSliderReleased(value) {
-    this.setState({ radius: value }, () => this.filterStateHasChanged());
+    this.setState({ radius: value }, this.filterStateHasChanged);
   }
   practiceAgeSliderChange(value) {
     this.setState({ practiceAge: value });
   }
 
   practiceAgeSliderReleased(value) {
-    this.setState({ practiceAge: value }, () => this.filterStateHasChanged());
+    this.setState({ practiceAge: value }, this.filterStateHasChanged);
   }
 
   feeRangeSliderChange(value) {
@@ -128,7 +141,7 @@ class FilterEditor extends Component {
   }
 
   feeRangeSliderReleased(value) {
-    this.setState({ feeRange: value }, () => this.filterStateHasChanged());
+    this.setState({ feeRange: value }, this.filterStateHasChanged);
   }
 
   addressChanged(newVal) {
@@ -147,8 +160,9 @@ class FilterEditor extends Component {
     }
 
     if (!newVal) {
-      this.setState({ coordinates: null, addressInputValidity: null }, () =>
-        this.filterStateHasChanged()
+      this.setState(
+        { coordinates: null, addressInputValidity: null },
+        this.filterStateHasChanged
       );
       return;
     }
@@ -160,7 +174,7 @@ class FilterEditor extends Component {
       .catch(() => {
         this.setState(
           { coordinates: null, addressInputValidity: "danger" },
-          () => this.filterStateHasChanged()
+          this.filterStateHasChanged
         );
       })
       .finally(() => {
@@ -178,22 +192,20 @@ class FilterEditor extends Component {
           lng: result.geometry.location.lng()
         }
       },
-      () => this.filterStateHasChanged()
+      this.filterStateHasChanged
     );
   }
 
   genderSelectChanged(evt) {
-    this.setState({ gender: evt.target.value }, () =>
-      this.filterStateHasChanged()
-    );
+    this.setState({ gender: evt.target.value }, this.filterStateHasChanged);
   }
 
   languageSelectChanged(idx) {
-    this.setState({ language: idx }, () => this.filterStateHasChanged());
+    this.setState({ language: idx }, this.filterStateHasChanged);
   }
 
   planSelectChanged(idx) {
-    this.setState({ plan: idx }, () => this.filterStateHasChanged());
+    this.setState({ plan: idx }, this.filterStateHasChanged);
   }
 
   contactInfoChanged(evt) {
@@ -203,9 +215,14 @@ class FilterEditor extends Component {
   }
 
   freeConsultChanged(evt) {
-    this.setState({ freeConsult: evt.target.checked }, () =>
-      this.filterStateHasChanged()
+    this.setState(
+      { freeConsult: evt.target.checked },
+      this.filterStateHasChanged
     );
+  }
+
+  websiteChanged(evt) {
+    this.setState({ website: evt.target.checked }, this.filterStateHasChanged);
   }
 
   addressInputChanged(evt) {
@@ -237,7 +254,7 @@ class FilterEditor extends Component {
       .split(" ")
       .reduce(FilterEditor.keywordReducer);
 
-    this.setState({ keywords: val }, () => this.filterStateHasChanged());
+    this.setState({ keywords: val }, this.filterStateHasChanged);
   }
 
   render() {
@@ -370,7 +387,7 @@ class FilterEditor extends Component {
               defaultValue={this.state.gender}
               onChange={this.genderSelectChanged}
             >
-              {this.genderOptions}
+              {GENDER_OPTIONS}
             </select>
           </div>
         </label>
@@ -381,25 +398,23 @@ class FilterEditor extends Component {
           callback={this.languageSelectChanged}
         />
 
-        <label className="pt-control pt-checkbox pt-large">
-          <input
-            type="checkbox"
-            defaultValue={this.state.contact}
-            onChange={this.contactInfoChanged}
-          />
-          <span className="pt-control-indicator" />
-          Has Contact Info
-        </label>
+        <CheckBox
+          defaultValue={this.state.contact}
+          onChange={this.contactInfoChanged}
+          text={"Has Contact Info"}
+        />
 
-        <label className="pt-control pt-checkbox pt-large">
-          <input
-            type="checkbox"
-            defaultValue={this.state.freeConsult}
-            onChange={this.freeConsultChanged}
-          />
-          <span className="pt-control-indicator" />
-          Free Consult
-        </label>
+        <CheckBox
+          defaultValue={this.state.freeConsult}
+          onChange={this.freeConsultChanged}
+          text={"Free Consult"}
+        />
+
+        <CheckBox
+          defaultValue={this.state.website}
+          onChange={this.websiteChanged}
+          text={"Has Website"}
+        />
       </div>
     );
   }
