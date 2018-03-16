@@ -66,6 +66,7 @@
       span
       {
         background-color: $light-gray1;
+        color: red;
       }
     }
   }
@@ -80,4 +81,18 @@
       }
     }
   }
+
+  .phone-item
+  {
+    .number{
+      padding-right: 5px;
+    }
+
+    .directory {
+      color: $gray1;
+    }
+  }
+
 }
+
+
