@@ -134,6 +134,7 @@ class FixtureMultiSelectPre extends FixtureSelectBase {
           itemPredicate={FixtureMultiSelectPre.valuePredicate}
           itemRenderer={FixtureMultiSelectPre.renderItem}
           items={this.elementList}
+          resetOnSelect={true}
           noResults={<MenuItem key={0} disabled={true} text="No results." />}
           onItemSelect={this.cb}
           tagRenderer={idx => <span data-index={idx}>{fixture[idx]}</span>}
