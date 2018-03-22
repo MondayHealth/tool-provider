@@ -1,5 +1,7 @@
+const IS_AWS = window.location.host === "dgh6s2xj34ynl.cloudfront.net";
+
 function apiURL(subLocation) {
-  return `/api/1/${subLocation}`;
+  return `${IS_AWS ? "https://tools.monday.health/" : "/"}api/1/${subLocation}`;
 }
 
 export const REQUEST_ERROR = "REQUEST_ERROR";
