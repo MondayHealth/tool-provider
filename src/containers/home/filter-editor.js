@@ -342,21 +342,6 @@ class FilterEditor extends Component {
           </div>
         </label>
 
-        <label className={"pt-label"}>
-          Group / Orientation
-          <div className={"pt-input-group"}>
-            <span className="pt-icon pt-icon-search" />
-            <input
-              type="text"
-              className="pt-input"
-              placeholder="Enter Keywords"
-              onKeyUp={this.keywordInputKeyUp}
-              onChange={this.keywordInputChanged}
-              value={this.state.keywords}
-            />
-          </div>
-        </label>
-
         <FixtureSelect
           displayName={"Payor"}
           propertyName={"payors"}
@@ -397,6 +382,22 @@ class FilterEditor extends Component {
           propertyName={"languages"}
           callback={this.languageSelectChanged}
         />
+
+        <label className={"pt-label"}>
+          Group / Orientation
+          <div className={"pt-input-group"}>
+            <span className="pt-icon pt-icon-search" />
+            <input
+              type="text"
+              className="pt-input"
+              placeholder="Enter Keywords"
+              onKeyUp={this.keywordInputKeyUp}
+              onChange={this.keywordInputChanged}
+              value={this.state.keywords}
+            />
+          </div>
+        </label>
+
 
         <CheckBox
           defaultValue={this.state.contact}
