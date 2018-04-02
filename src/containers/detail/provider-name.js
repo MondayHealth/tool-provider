@@ -6,12 +6,17 @@ const BoolIcon = ({ value, icon }) => {
   return <span className={className} />;
 };
 
+function processWebsite(raw) {
+  return raw.replace("/rms/", "/us/");
+}
+
 const ProviderName = ({ elt }) => {
   let globe;
 
   if (elt.websiteURL) {
+    let converted = processWebsite(elt.websiteURL);
     globe = (
-      <a rel="noopener noreferrer" target="_blank" href={elt.websiteURL}>
+      <a rel="noopener noreferrer" target="_blank" href={converted}>
         <span className={"pt-icon-globe"} />
       </a>
     );
