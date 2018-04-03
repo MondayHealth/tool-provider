@@ -120,6 +120,10 @@ class Home extends Component {
       delete params.website;
     }
 
+    if (!params.name) {
+      delete params.name;
+    }
+
     if (params.payor) {
       if (params.plan) {
         delete params.payor;

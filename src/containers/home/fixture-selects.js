@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Button, MenuItem } from "@blueprintjs/core";
+import { Button, Classes, MenuItem } from "@blueprintjs/core";
 import { MultiSelect, Select } from "@blueprintjs/select";
 import { connect } from "react-redux";
 
@@ -44,8 +44,7 @@ class FixtureSelectBase extends Component {
   }
 
   static valuePredicate(pred, [index, value]) {
-    const val = pred.trim().toLowerCase();
-    return !val ? true : value.toLowerCase().indexOf(val) > -1;
+    return value.toLowerCase().indexOf(pred.toLowerCase()) >= 0;
   }
 
   static renderItem([idx, value], { handleClick, modifiers }) {
@@ -58,7 +57,13 @@ class FixtureSelectBase extends Component {
     }
 
     return (
-      <MenuItem key={idx} label={idx} text={value} onClick={handleClick} />
+      <MenuItem
+        className={modifiers.active ? Classes.ACTIVE : ""}
+        key={idx}
+        label={idx}
+        text={value}
+        onClick={handleClick}
+      />
     );
   }
 
@@ -103,8 +108,6 @@ class FixtureMultiSelectPre extends FixtureSelectBase {
     this.selectedIndicies = new Set();
 
     this.toggleProp = this.toggleProp.bind(this);
-
-    this.insertBlank = false;
   }
 
   toggleProp(index) {

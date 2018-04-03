@@ -51,7 +51,8 @@ class FilterEditor extends Component {
       freeConsult: false,
       website: false,
       freeInputValue: "",
-      keywords: ""
+      keywords: "",
+      name: ""
     };
 
     this.lastAddressSearched = "";
@@ -73,10 +74,14 @@ class FilterEditor extends Component {
     this.feeRangeSliderChange = this.feeRangeSliderChange.bind(this);
     this.feeRangeSliderReleased = this.feeRangeSliderReleased.bind(this);
     this.modalitySelectChanged = this.modalitySelectChanged.bind(this);
-    this.keywordInputChanged = this.keywordInputChanged.bind(this);
-    this.keywordInputKeyUp = this.keywordInputKeyUp.bind(this);
     this.planSelectChanged = this.planSelectChanged.bind(this);
     this.websiteChanged = this.websiteChanged.bind(this);
+    this.nameChanged = this.nameChanged.bind(this);
+
+    this.keywordInputKeyUp = this.generateKeyUpHandler("keywords");
+    this.keywordInputChanged = this.generateInputChanged("keywords");
+    this.nameInputKeyUp = this.generateKeyUpHandler("name");
+    this.nameInputChanged = this.generateInputChanged("name");
 
     this.filterStateHasChanged = this.filterStateHasChanged.bind(this);
   }
@@ -89,12 +94,13 @@ class FilterEditor extends Component {
       radius: this.state.radius,
       practiceAge: this.state.practiceAge,
       gender: this.state.gender,
-      contact: !!this.state.contact,
+      contact: this.state.contact,
       language: this.state.language,
       modality: this.state.modality,
       freeConsult: this.state.freeConsult,
       keywords: this.state.keywords,
-      website: this.state.website
+      website: this.state.website,
+      name: this.state.name
     };
 
     let [min, max] = this.state.feeRange;
@@ -142,6 +148,10 @@ class FilterEditor extends Component {
 
   feeRangeSliderReleased(value) {
     this.setState({ feeRange: value }, this.filterStateHasChanged);
+  }
+
+  nameChanged(value) {
+    this.setState({ name: value }, this.filterStateHasChanged);
   }
 
   addressChanged(newVal) {
@@ -235,8 +245,8 @@ class FilterEditor extends Component {
     }
   }
 
-  keywordInputChanged(evt) {
-    this.setState({ keywords: evt.target.value });
+  generateInputChanged(propertyName) {
+    return evt => this.setState({ [propertyName]: evt.target.value });
   }
 
   static keywordReducer(acc, elt) {
@@ -244,17 +254,19 @@ class FilterEditor extends Component {
     return e ? acc + " " + e : acc;
   }
 
-  keywordInputKeyUp(evt) {
-    if (evt.keyCode !== 13) {
-      return;
-    }
+  generateKeyUpHandler(propertyName) {
+    return evt => {
+      if (evt.keyCode !== 13) {
+        return false;
+      }
 
-    let val = evt.target.value
-      .replace(/[|&;$%@:*,./'"<>()+]/g, "")
-      .split(" ")
-      .reduce(FilterEditor.keywordReducer);
+      const val = evt.target.value
+        .replace(/[|&;$%@:*,./'"<>()+]/g, "")
+        .split(" ")
+        .reduce(FilterEditor.keywordReducer);
 
-    this.setState({ keywords: val }, this.filterStateHasChanged);
+      this.setState({ [propertyName]: val }, this.filterStateHasChanged);
+    };
   }
 
   render() {
@@ -342,6 +354,21 @@ class FilterEditor extends Component {
           </div>
         </label>
 
+        <label className={"pt-label"}>
+          Name
+          <div className={"pt-input-group"}>
+            <span className="pt-icon pt-icon-search" />
+            <input
+              type="text"
+              className="pt-input"
+              placeholder="Enter Keywords"
+              onKeyUp={this.nameInputKeyUp}
+              onChange={this.nameInputChanged}
+              value={this.state.name}
+            />
+          </div>
+        </label>
+
         <FixtureSelect
           displayName={"Payor"}
           propertyName={"payors"}
@@ -397,7 +424,6 @@ class FilterEditor extends Component {
             />
           </div>
         </label>
-
 
         <CheckBox
           defaultValue={this.state.contact}

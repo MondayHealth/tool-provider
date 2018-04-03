@@ -16,7 +16,12 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="@types/google-maps" level="application" />
-    <orderEntry type="library" name="blueprintjs" level="project" />
     <orderEntry type="library" name="blueprint-variables" level="project" />
+    <orderEntry type="library" name="@types/react" level="application" />
+    <orderEntry type="library" name="blueprintjs" level="project" />
+    <orderEntry type="library" name="@types/react-redux" level="application" />
+    <orderEntry type="library" name="@types/react-router" level="application" />
+    <orderEntry type="library" name="@types/react-router-redux" level="application" />
+    <orderEntry type="library" name="@types/googlemaps" level="application" />
   </component>
 </module>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="JavaScriptLibraryMappings">
-    <file url="PROJECT" libraries="{@types/google-maps, blueprint-variables}" />
+    <file url="PROJECT" libraries="{@types/google-maps, @types/googlemaps, @types/react, @types/react-redux, @types/react-router, @types/react-router-redux, blueprintjs}" />
   </component>
 </project>
