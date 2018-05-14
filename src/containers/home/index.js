@@ -46,6 +46,8 @@ class Home extends Component {
       payor: 0,
       plan: 0,
       specialties: [],
+      degrees: [],
+      credentials: [],
       coordinates: null,
       radius: 1,
       gender: 0,
@@ -82,11 +84,17 @@ class Home extends Component {
       delete params.payor;
     }
 
-    if (params.specialties.length < 1) {
-      delete params.specialties;
-    } else {
-      params.specialties = params.specialties.join(",");
-    }
+    const arrayParam = name => {
+      if (params[name].length < 1) {
+        delete params[name];
+      } else {
+        params[name] = params[name].join(",");
+      }
+    };
+
+    arrayParam("specialties");
+    arrayParam("degrees");
+    arrayParam("credentials");
 
     if (params.gender < 1) {
       delete params.gender;

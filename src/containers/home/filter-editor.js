@@ -37,6 +37,8 @@ class FilterEditor extends Component {
       payor: 0,
       plan: 0,
       specialties: [],
+      credentials: [],
+      degrees: [],
       gender: 0,
       language: 0,
       modality: 0,
@@ -59,6 +61,8 @@ class FilterEditor extends Component {
 
     this.payorSelectChanged = this.payorSelectChanged.bind(this);
     this.specialtySelectChanged = this.specialtySelectChanged.bind(this);
+    this.credentialsSelectChanged = this.credentialsSelectChanged.bind(this);
+    this.degreesSelectChanged = this.degreesSelectChanged.bind(this);
     this.addressChanged = this.addressChanged.bind(this);
     this.addressInputKeyUp = this.addressInputKeyUp.bind(this);
     this.addressInputChanged = this.addressInputChanged.bind(this);
@@ -91,6 +95,8 @@ class FilterEditor extends Component {
       payor: this.state.payor,
       plan: this.state.plan,
       specialties: this.state.specialties,
+      degrees: this.state.degrees,
+      credentials: this.state.credentials,
       radius: this.state.radius,
       practiceAge: this.state.practiceAge,
       gender: this.state.gender,
@@ -124,6 +130,14 @@ class FilterEditor extends Component {
     this.setState({ specialties: values }, this.filterStateHasChanged);
   }
 
+  credentialsSelectChanged(credentials) {
+    this.setState({ credentials }, this.filterStateHasChanged);
+  }
+
+  degreesSelectChanged(degrees) {
+    this.setState({ degrees }, this.filterStateHasChanged);
+  }
+
   modalitySelectChanged(value) {
     this.setState({ modality: value }, this.filterStateHasChanged);
   }
@@ -134,6 +148,7 @@ class FilterEditor extends Component {
   radiusSliderReleased(value) {
     this.setState({ radius: value }, this.filterStateHasChanged);
   }
+
   practiceAgeSliderChange(value) {
     this.setState({ practiceAge: value });
   }
@@ -384,6 +399,18 @@ class FilterEditor extends Component {
           displayName={"Specialties"}
           propertyName={"specialties"}
           callback={this.specialtySelectChanged}
+        />
+
+        <FixtureMultiSelect
+          displayName={"Credential"}
+          propertyName={"credentials"}
+          callback={this.credentialsSelectChanged}
+        />
+
+        <FixtureMultiSelect
+          displayName={"Degree"}
+          propertyName={"degrees"}
+          callback={this.degreesSelectChanged}
         />
 
         <FixtureSelect
